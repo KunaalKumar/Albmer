@@ -24,11 +24,14 @@ namespace Albmer.Controllers
                 response.EnsureSuccessStatusCode();
                 string responseBody = response.Content.ReadAsStringAsync().Result;
                 MusicBrainzResult result = JsonConvert.DeserializeObject<MusicBrainzResult>(responseBody);
-                return new JsonResult(new { result = result.artists[0].name });
+                if (result.artists.Count > 0)
+                    return new JsonResult(new { success = true, result = result.artists[0].name });
+                else
+                    return new JsonResult(new { success = false, result = "No result found matching query" });
             }
             catch (HttpRequestException e)
             {
-                return new JsonResult(new { result = "error"});
+                return new JsonResult(new { success = false, result = "Error: " + e});
             }
         }
     }
