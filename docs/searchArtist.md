@@ -14,6 +14,7 @@ Get a list of results matching given query
   "success": true,
   "artists": [
     {
+	  "id": "084308bd-1654-436f-ba03-df6697104e19",
       "name": "Green Day",
       "country": "US",
       "begin-area": {
@@ -47,4 +48,7 @@ Get a list of results matching given query
 	"response": "No result found matching query"
 }
 ```
+## Notes
+* Data will be gotten from MusicBrainz
+* [MusicBrainz Example API Call](https://musicbrainz.org/ws/2/artist/?query=green%20day&fmt=json)
 
