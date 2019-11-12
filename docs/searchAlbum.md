@@ -7,7 +7,7 @@ Get a list of album releases matching given query
 
 **PARAMETERS** : 
 * `name=[string]`
-* Name of album to query
+	* Name of album to query
 
 ## Success Response Example
 ```json
