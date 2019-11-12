@@ -7,7 +7,7 @@ $('#search-form').submit(function (e)
 {
     e.preventDefault();
     $.ajax({
-        url: "/MusicBrainz/Find" + $('#search-type').val(),
+        url: "/API/search" + $('#search-type').val(),
         data: { name: $('#search').val() },
         method: "GET"
     })

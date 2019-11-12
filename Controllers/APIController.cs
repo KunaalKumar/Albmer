@@ -10,11 +10,11 @@ using Newtonsoft.Json;
 
 namespace Albmer.Controllers
 {
-    public class MusicBrainzController : ControllerBase
+    public class APIController : ControllerBase
     {
-        // MusicBrainz/FindArtist?name={artist_name}
+        // API/searchArtist?name={artist_name}
         [HttpGet]
-        public JsonResult FindArtist(string name)
+        public JsonResult searchArtist(string name)
         {
             try
             {
