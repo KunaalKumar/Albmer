@@ -19,7 +19,7 @@ namespace Albmer.Models
         public string type;
         public int score;
         [JsonProperty("type-id")]
-        public string type_id;
+        public string elen;
         public string name;
     }
 }
