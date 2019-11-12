@@ -45,8 +45,8 @@ Get a list of album releases matching given query
 ## Failure Response Example
 ```json
 {
-		"success": false,
-				"response": "No result found matching query"
+	"success": false,
+	"response": "No result found matching query"
 }
 ```
 
