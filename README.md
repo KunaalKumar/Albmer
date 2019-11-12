@@ -4,12 +4,12 @@ Albmer will scrape various music related sites for album reviews and ratings. Th
 ## API Endpoints
 
 ### Search Related
-* [Search artist](docs/searchArtist) : `GET /API/searchArtist/`
-* [Search album](docs/searchAlbum) : `GET /API/searchAlbum/`
+* [Search artist](docs/searchArtist.md) : `GET /API/searchArtist/`
+* [Search album](docs/searchAlbum.md) : `GET /API/searchAlbum/`
 
 ### Scraper Related
-* [Get AllMusic Album Rating](docs/allMusicRating): `GET /AllMusic/getAlbumRating`
-* [Get Discogs Album Rating](docs/discogsRating): `GET /Discogs/getAlbumRating`
-* [Get RateYourMusic Album Rating](docs/rateYourMusicRating): `GET /RateYourMusic/getAlbumRating`
-* [Get Pitchfork Album Rating](docs/pitchforkRating): `GET /Pitchfork/getAlbumRating`
-* [Get Metacritic Album Rating](docs/metacriticRating): `GET /Metacritic/getAlbumRating`
+* [Get AllMusic Album Rating](docs/allMusicRating.md): `GET /AllMusic/getAlbumRating`
+* [Get Discogs Album Rating](docs/discogsRating.md): `GET /Discogs/getAlbumRating`
+* [Get RateYourMusic Album Rating](docs/rateYourMusicRating.md): `GET /RateYourMusic/getAlbumRating`
+* [Get Pitchfork Album Rating](docs/pitchforkRating.md): `GET /Pitchfork/getAlbumRating`
+* [Get Metacritic Album Rating](docs/metacriticRating.md): `GET /Metacritic/getAlbumRating`
