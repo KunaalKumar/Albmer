@@ -11,32 +11,32 @@ Get a list of results matching given query
 ## Success Response Example
 ```json
 {
-	"success": true,
-	"artists": [
-		{
-			"name": "Green Day",
-			"country": "US",
-			"begin-area": {
-				"type": "City",
-				"name": "Berkeley",
-			},
-			"life-span": {
-				"begin": "1989",
-				"ended": null
-			},
-			"tags": [
-				{
-					"name": "rock"
-				},
-				{
-					"name": "alternative rock"
-				},
-				{
-					"name": "punk"
-				}
-			]
-		}
-	]
+  "success": true,
+  "artists": [
+    {
+      "name": "Green Day",
+      "country": "US",
+      "begin-area": {
+        "type": "City",
+        "name": "Berkeley"
+      },
+      "life-span": {
+        "begin": "1989",
+        "ended": null
+      },
+      "tags": [
+        {
+          "name": "rock"
+        },
+        {
+          "name": "alternative rock"
+        },
+        {
+          "name": "punk"
+        }
+      ]
+    }
+  ]
 }
 ```
 
