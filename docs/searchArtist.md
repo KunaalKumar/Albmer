@@ -53,6 +53,6 @@ Get a list of results matching given query
 ```
 
 ## Notes
-* Data will be gotten from MusicBrainz
+* Data will be fetched from MusicBrainz
 * [MusicBrainz Example API Call](https://musicbrainz.org/ws/2/artist/?query=green%20day&fmt=json)
 

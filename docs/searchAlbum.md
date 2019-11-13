@@ -51,5 +51,5 @@ Get a list of album releases matching given query
 ```
 
 ## Notes
-* Data will be gotten from MusicBrainz
+* Data will be fetched from MusicBrainz
 * [MusicBrainz Example API Call](http://musicbrainz.org/ws/2/release-group/?query=%2221st%20century%20breakdown%22%20AND%20type:album&fmt=json)
