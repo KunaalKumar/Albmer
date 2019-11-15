@@ -67,4 +67,4 @@ Get artist details based on given id
 
 ## Notes 
 * Data will be fetched from MusicBrainz
-* [MusicBrainz Example API Call](https://musicbrainz.org/ws/2/artist/084308bd-1654-436f-ba03-df6697104e19?fmt=json&inc=url-rels%20release-groups%20artist-rels)
+* [MusicBrainz Example API Call](https://musicbrainz.org/ws/2/artist/084308bd-1654-436f-ba03-df6697104e19?fmt=json&inc=releases&status=official)
