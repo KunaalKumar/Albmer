@@ -1,4 +1,4 @@
-l Artist Details
+# Artist Details
 Get artist details based on given id
 
 **URL** : `API/artistDetails`
