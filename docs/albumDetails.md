@@ -29,6 +29,16 @@ Get album details based on given id
       "length": 150000,
       "title": "One for the Razorbacks"
     }
+  ],
+  "urls": [
+    {
+      "type": "allmusic",
+      "link": "https://www.allmusic.com/album/mw0000096356"
+    },
+    {
+      "type": "discogs",
+      "link": "https://www.discogs.com/master/33172"
+    }
   ]
 }
 ```
@@ -43,4 +53,5 @@ Get album details based on given id
 
 ## Notes 
 * Data will be fetched from MusicBrainz
-* [MusicBrainz Example API Call](https://musicbrainz.org/ws/2/release/fd3c6333-9e3e-4360-aff7-05c0512e8b38?fmt=json&inc=recordings+artists)
+* [MusicBrainz Example API Call](https://musicbrainz.org/ws/2/release/fd3c6333-9e3e-4360-aff7-05c0512e8b38?fmt=json&inc=release-groups%20recordings%20artists)
+* [MusicBrainz Example API Call to get release-group](https://musicbrainz.org/ws/2/release-group/a0603694-2422-3a40-b946-d0bcea5e8254?fmt=json&inc=url-rels)
