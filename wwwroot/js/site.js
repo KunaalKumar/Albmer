@@ -12,8 +12,18 @@ $('#search-form').submit(function (e)
         method: "GET"
     })
         .then(function (result) {
-            console.log(result.result[0].tags[0].name);
-            console.log(result.result[0].begin_area.name);
-            console.log(result.result[0].life_span.begin);
+            if (!result.success)
+                return;
+            if ($('#search-type').val() === "Artist") {
+                console.log(result.result[0].name);
+                console.log(result.result[0].tags[0].name);
+                console.log(result.result[0].begin_area.name);
+                console.log(result.result[0].life_span.begin);
+            } else {
+                console.log(result.result[0].title);
+                console.log(result.result[0].score);
+                console.log(result.result[0].artist_credit[0].artist.name);
+                console.log(result.result[0].tags[0].name);
+            }
         });
 });

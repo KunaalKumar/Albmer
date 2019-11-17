@@ -8,20 +8,33 @@ namespace Albmer.Models
     /**
      * The following classes are to serialize and deserialize MusicBrainz API responses
      */
-    public class MusicBrainzResult
+    public class MusicBrainzArtistSearchResult
     {
         public DateTime created { get; set; }
         public int count { get; set; }
         public int offset { get; set; }
         public List<Artist> artists { get; set; }
     }
+    public class MusicBrainzAlbumSearchResult
+    {
+        public DateTime created { get; set; }
+        public int count { get; set; }
+        public int offset { get; set; }
+        [JsonProperty("release-groups")]
+        public List<Album> release_groups { get; set; }
+    }
 
     public class Artist
     {
+        [JsonProperty("id")]
         public string id { get; set; }
+        [JsonProperty("type")]
         public string type { get; set; }
+        [JsonProperty("score")]
         public int score { get; set; }
+        [JsonProperty("country")]
         public string country { get; set; }
+        [JsonProperty("name")]
         public string name { get; set; }
         [JsonProperty("tags")]
         public List<SubName> tags { get; set; }
@@ -44,5 +57,36 @@ namespace Albmer.Models
         public string begin { get; set; }
         [JsonProperty("ended")]
         public string ended { get; set; }
+    }
+
+    public class Album
+    {
+        [JsonProperty("id")]
+        public string id { get; set; }
+        [JsonProperty("count")]
+        public int count { get; set; }
+        [JsonProperty("score")]
+
+        public int score { get; set; }
+        [JsonProperty("title")]
+        public string title { get; set; }
+        [JsonProperty("tags")]
+        public List<SubName> tags { get; set; }
+        [JsonProperty("artist-credit")]
+        public List<ArtistCredit> artist_credit { get; set; }
+    }
+
+    public class ArtistCredit
+    {
+        [JsonProperty("artist")]
+        public ArtistSub1 artist { get; set; }
+    }
+
+    public class ArtistSub1
+    {
+        [JsonProperty("id")]
+        public string id { get; set; }
+        [JsonProperty("name")]
+        public string name { get; set; }
     }
 }
