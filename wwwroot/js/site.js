@@ -12,6 +12,8 @@ $('#search-form').submit(function (e)
         method: "GET"
     })
         .then(function (result) {
-            alert("Result = " + result);
+            console.log(result.result[0].tags[0].name);
+            console.log(result.result[0].begin_area.name);
+            console.log(result.result[0].life_span.begin);
         });
 });
