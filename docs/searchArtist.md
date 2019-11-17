@@ -10,6 +10,21 @@ Get a list of results matching given query
 * `name=[string]`
 	* Name of artist to query
 
+**RETURN**<br>
+* success: bool
+* artist: array
+	* id: string
+	* score: int
+	* name: string
+	* country: string
+	* begin_area: object
+		* name: string
+	* life_span: object
+		* begin: string
+		* ended: string
+	* tags: array
+		* name: string
+
 ## Success Response Example
 ```json
 {
@@ -20,11 +35,10 @@ Get a list of results matching given query
       "score": 100,
       "name": "Green Day",
       "country": "US",
-      "begin-area": {
-        "type": "City",
+      "begin_area": {
         "name": "Berkeley"
       },
-      "life-span": {
+      "life_span": {
         "begin": "1989",
         "ended": null
       },
