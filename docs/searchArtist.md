@@ -12,55 +12,56 @@ Get a list of results matching given query
 
 **RETURN**<br>
 * success: bool
-* artist: array
-	* id: string
-	* score: int
-	* name: string
-	* country: string
-	* begin_area: object
+* result: object
+	* artist: array
+		* id: string
+		* score: int
 		* name: string
-	* life_span: object
-		* begin: string
-		* ended: string
-	* tags: array
-		* name: string
+		* country: string
+		* begin_area: object
+			* name: string
+		* life_span: object
+			* begin: string
+			* ended: string
+		* tags: array
+			* name: string
 
 ## Success Response Example
 ```json
 {
   "success": true,
-  "artists": [
-    {
-      "id": "084308bd-1654-436f-ba03-df6697104e19",
-      "score": 100,
-      "name": "Green Day",
-      "country": "US",
-      "begin_area": {
-        "name": "Berkeley"
-      },
-      "life_span": {
-        "begin": "1989",
-        "ended": null
-      },
-      "tags": [
-        {
-          "name": "rock"
+  "result": {
+    "artists": [
+      {
+        "id": "084308bd-1654-436f-ba03-df6697104e19",
+        "score": 100,
+        "name": "Green Day",
+        "country": "US",
+        "begin_area": {
+          "name": "Berkeley"
         },
-        {
-          "name": "alternative rock"
+        "life_span": {
+          "begin": "1989",
+          "ended": null
         },
-        {
-          "name": "punk"
-        }
-      ]
-    }
-  ]
+        "tags": [
+          {
+            "name": "rock"
+          },
+          {
+            "name": "alternative rock"
+          },
+          {
+            "name": "punk"
+          }
+        ]
+      }
+    ]
+  }
 }
 ```
 
 ## Failure Response Example
-```json
-{
 	"success": false,
 	"response": "No result found matching query"
 }

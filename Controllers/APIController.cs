@@ -14,21 +14,24 @@ namespace Albmer.Controllers
     {
 
         private static string userAgent = "Albmer/1.0.0a (https://www.utah.edu/)";
+        private HttpClient client = new HttpClient();
+        public APIController() 
+        {
+            client.DefaultRequestHeaders.Add("User-Agent", userAgent);
+        }
 
         [HttpGet]
         public JsonResult searchArtist(string name)
         {
             try
             {
-                HttpClient client = new HttpClient();
-                client.DefaultRequestHeaders.Add("User-Agent", userAgent);
                 HttpResponseMessage response = client.GetAsync("https://musicbrainz.org/ws/2/artist?query=" + name + "&fmt=json").Result;
                 response.EnsureSuccessStatusCode();
                 string responseBody = response.Content.ReadAsStringAsync().Result;
                 MusicBrainzArtistSearchResult result = JsonConvert.DeserializeObject<MusicBrainzArtistSearchResult>(responseBody);
                 if (result.artists.Count > 0)
                 {
-                    var test = result.artists.Select(artist => new
+                    var data = result.artists.Select(artist => new
                     {
                         artist.id,
                         artist.name,
@@ -38,7 +41,7 @@ namespace Albmer.Controllers
                         artist.begin_area,
                         artist.life_span
                     });
-                    return Json(new { success = true, result = test });
+                    return Json(new { success = true, result = data });
                 }
                 else
                     return Json(new { success = false, result = "No result found matching query" });
@@ -54,15 +57,13 @@ namespace Albmer.Controllers
         {
             try
             {
-                HttpClient client = new HttpClient();
-                client.DefaultRequestHeaders.Add("User-Agent", userAgent);
                 HttpResponseMessage response = client.GetAsync("http://musicbrainz.org/ws/2/release-group/?query=" + name + "%20AND%20type:album&fmt=json").Result;
                 response.EnsureSuccessStatusCode();
                 string responseBody = response.Content.ReadAsStringAsync().Result;
                 MusicBrainzAlbumSearchResult result = JsonConvert.DeserializeObject<MusicBrainzAlbumSearchResult>(responseBody);
                 if (result.release_groups.Count > 0)
                 {
-                    var test = result.release_groups.Select(album => new
+                    var data = result.release_groups.Select(album => new
                     {
                         album.id,
                         album.title,
@@ -70,7 +71,70 @@ namespace Albmer.Controllers
                         album.artist_credit,
                         album.tags
                     });
-                    return Json(new { success = true, result = test });
+                    return Json(new { success = true, result = data });
+                }
+                else
+                    return Json(new { success = false, result = "No result found matching query" });
+            }
+            catch (HttpRequestException e)
+            {
+                return Json(new { success = false, result = "Error: " + e });
+            }
+        }
+
+        [HttpGet]
+        public JsonResult artistDetails(string id)
+        {
+            try
+            {
+                HttpResponseMessage response = client.GetAsync("https://musicbrainz.org/ws/2/artist/" + id + "?fmt=json&inc=url-rels+release-groups+artist-rels").Result;
+                response.EnsureSuccessStatusCode();
+                string responseBody = response.Content.ReadAsStringAsync().Result;
+                ArtistDetails result = JsonConvert.DeserializeObject<ArtistDetails>(responseBody);
+                if (result.error == null)
+                {
+                    var image = result.relations.Where(relation => relation.type.Equals("image"))
+                        .Select(relation => relation.url.resource)
+                        .FirstOrDefault();
+
+                    var band_memebers = result.relations.Where(relation => relation.type.Equals("member of band"))
+                        .Select(relation => new 
+                        { 
+                            relation.artist.id,
+                            relation.artist.name,
+                            start_year = relation.begin,
+                            end_year = relation.end
+                        });
+
+                    var official_website = result.relations.Where(relation => relation.type.Equals("official homepage"))
+                        .Select(relation => relation.url.resource)
+                        .FirstOrDefault();
+
+                    var allmusic = result.relations.Where(relation => relation.type.Equals("allmusic"))
+                        .Select(relation => relation.url.resource)
+                        .FirstOrDefault();
+
+                    var discogs = result.relations.Where(relation => relation.type.Equals("discogs"))
+                        .Select(relation => relation.url.resource)
+                        .FirstOrDefault();
+
+                    var rate_your_music = result.relations.Where(relation => relation.type.Equals("other databases") && relation.url.resource.Contains("rateyourmusic.com"))
+                        .Select(relation => relation.url.resource)
+                        .FirstOrDefault();
+
+                    var data = new
+                    {
+                        image,
+                        result.name,
+                        result.life_span,
+                        band_memebers,
+                        result.albums,
+                        official_website,
+                        allmusic,
+                        discogs,
+                        rate_your_music
+                    };
+                    return Json(new { success = true, result = data });
                 }
                 else
                     return Json(new { success = false, result = "No result found matching query" });

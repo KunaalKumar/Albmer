@@ -11,46 +11,49 @@ Get a list of album releases matching given query
 
 **RESULT**<br>
 * success: bool
-* albums: array
-	* id: string
-	* score: int
-	* count: int
-	* title: string
-	* artist_credit: array
-		* artist: object
-			* id: string
+* result: object
+	* albums: array
+		* id: string
+		* score: int
+		* count: int
+		* title: string
+		* artist_credit: array
+			* artist: object
+				* id: string
+				* name: string
+		* tags: array
 			* name: string
-	* tags: array
-		* name: string
 
 ## Success Response Example
 ```json
 {
   "success": true,
-  "albums": [
-    {
-      "id": "37608ff2-3168-3e7c-a77e-04a4b7300c1b",
-      "score": 100,
-      "count": 13,
-      "title": "21st Century Breakdown",
-      "artist_credit": [
-        {
-          "artist": {
-            "id": "084308bd-1654-436f-ba03-df6697104e19",
-            "name": "Green Day"
+  "result": {
+    "albums": [
+      {
+        "id": "37608ff2-3168-3e7c-a77e-04a4b7300c1b",
+        "score": 100,
+        "count": 13,
+        "title": "21st Century Breakdown",
+        "artist_credit": [
+          {
+            "artist": {
+              "id": "084308bd-1654-436f-ba03-df6697104e19",
+              "name": "Green Day"
+            }
           }
-        }
-      ],
-      "tags": [
-        {
-          "name": "rock"
-        },
-        {
-          "name": "punk"
-        }
-      ]
-    }
-  ]
+        ],
+        "tags": [
+          {
+            "name": "rock"
+          },
+          {
+            "name": "punk"
+          }
+        ]
+      }
+    ]
+  }
 }
 ```
 

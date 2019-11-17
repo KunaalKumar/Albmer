@@ -55,8 +55,10 @@ namespace Albmer.Models
     {
         [JsonProperty("begin")]
         public string begin { get; set; }
+        [JsonProperty("end")]
+        public string end { get; set; }
         [JsonProperty("ended")]
-        public string ended { get; set; }
+        public bool ended { get; set; }
     }
 
     public class Album
@@ -88,5 +90,54 @@ namespace Albmer.Models
         public string id { get; set; }
         [JsonProperty("name")]
         public string name { get; set; }
+    }
+
+    public class ArtistDetails
+    {
+        [JsonProperty("error")]
+        public string error { get; set; }
+        [JsonProperty("name")]
+        public string name { get; set; }
+        [JsonProperty("life-span")]
+        public LifeSpan life_span { get; set; }
+        [JsonProperty("type")]
+        public string type { get; set; }
+        [JsonProperty("relations")]
+        public List<Relation> relations { get; set; }
+        [JsonProperty("release-groups")]
+        public List<ReleaseGroup> albums { get; set; }
+    }
+
+    public class Relation
+    {
+        [JsonProperty("target-type")]
+        public string target_type { get; set; }
+        [JsonProperty("type")]
+        public string type { get; set; }
+        [JsonProperty("url")]
+        public BrainzURL url { get; set; }
+        // The following only apply to band members
+        [JsonProperty("artist")]
+        public ArtistSub1 artist { get; set; }
+        [JsonProperty("begin")]
+        public string begin { get; set; }
+        [JsonProperty("end")]
+        public string end { get; set; }
+    }
+
+    public class BrainzURL
+    {
+        [JsonProperty("resource")]
+        public string resource { get; set; }
+    }
+
+    public class ReleaseGroup
+    {
+        [JsonProperty("id")]
+        public string id { get; set; }
+        [JsonProperty("title")]
+        public string title { get; set; }
+        [JsonProperty("first-release-date")]
+        public string release_date { get; set; }
     }
 }
