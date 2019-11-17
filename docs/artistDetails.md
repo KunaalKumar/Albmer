@@ -74,7 +74,7 @@ Get artist details based on given id
 ```json
 {
 	"success": false,
-	"response": "Artist with given id not found"
+	"result": "Artist with given id not found"
 }
 ```
 

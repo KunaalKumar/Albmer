@@ -63,7 +63,7 @@ Get a list of results matching given query
 
 ## Failure Response Example
 	"success": false,
-	"response": "No result found matching query"
+	"result": "No result found matching query"
 }
 ```
 

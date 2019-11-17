@@ -61,7 +61,7 @@ Get a list of album releases matching given query
 ```json
 {
 	"success": false,
-	"response": "No result found matching query"
+	"result": "No result found matching query"
 }
 ```
 
