@@ -13,14 +13,14 @@ namespace Albmer.Models
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.None)]
         public string ID { get; set; }
-        public string Name;
-        public string Type;
-        public string Image;
-        public string BeginYear;
-        public string EndYear;
-        public string Origin;
-				public string Genre;
+        public string Name { get; set; }
+        public string Type { get; set; }
+        public string Image { get; set; }
+        public string BeginYear { get; set; }
+        public string EndYear { get; set; }
+        public string Origin { get; set; }
+        public string Genre { get; set; }
 
-        public ICollection<Album> Albums;
+        public ICollection<Album> Albums { get; set; }
     }
 }

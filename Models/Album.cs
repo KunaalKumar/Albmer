@@ -12,12 +12,12 @@ namespace Albmer.Models
 		[Key]
         [DatabaseGenerated(DatabaseGeneratedOption.None)]
         public string ID { get; set; }
-        public string Title;
-        public string Image;
-        public string Date;
-	    public int TrackCount;
-        public string Genre;
+        public string Title { get; set; }
+        public string Image { get; set; }
+        public string Date { get; set; }
+        public int TrackCount { get; set; }
+        public string Genre { get; set; }
 
-        ICollection<Artist> Artists;
+        ICollection<Artist> Artists { get; set; }
     }
 }
