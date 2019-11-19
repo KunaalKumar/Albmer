@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Text.Json.Serialization;
 using Newtonsoft.Json;
 
-namespace Albmer.Models
+namespace Albmer.Data
 {
     /**
      * The following classes are to serialize and deserialize MusicBrainz API responses
@@ -13,7 +13,7 @@ namespace Albmer.Models
         public DateTime created { get; set; }
         public int count { get; set; }
         public int offset { get; set; }
-        public List<Artist> artists { get; set; }
+        public List<MBArtist> artists { get; set; }
     }
     public class MusicBrainzAlbumSearchResult
     {
@@ -21,10 +21,10 @@ namespace Albmer.Models
         public int count { get; set; }
         public int offset { get; set; }
         [JsonProperty("release-groups")]
-        public List<Album> release_groups { get; set; }
+        public List<MBAlbum> release_groups { get; set; }
     }
 
-    public class Artist
+    public class MBArtist
     {
         [JsonProperty("id")]
         public string id { get; set; }
@@ -61,7 +61,7 @@ namespace Albmer.Models
         public bool ended { get; set; }
     }
 
-    public class Album
+    public class MBAlbum
     {
         [JsonProperty("id")]
         public string id { get; set; }
