@@ -10,8 +10,8 @@ namespace Albmer.Models
     public class Album
     {
 		[Key]
-		[DatabaseGenerated(DatabaseGeneratedOption.None)]
-        public string ID;
+        [DatabaseGenerated(DatabaseGeneratedOption.None)]
+        public string ID { get; set; }
         public string Title;
         public string Image;
         public string Date;
