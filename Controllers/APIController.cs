@@ -3,11 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
+using Albmer.Data;
 using Albmer.Models;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using Albmer.Data;
 
 namespace Albmer.Controllers
 {
@@ -16,8 +16,10 @@ namespace Albmer.Controllers
 
         private static string userAgent = "Albmer/1.0.0a (https://www.utah.edu/)";
         private HttpClient client = new HttpClient();
-        public APIController() 
+        private readonly CacheContext _context;
+        public APIController(CacheContext context) 
         {
+            _context = context;
             client.DefaultRequestHeaders.Add("User-Agent", userAgent);
         }
 

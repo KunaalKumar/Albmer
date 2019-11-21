@@ -31,7 +31,7 @@ $('#search-form').submit(function (e)
 /**
  * Function to test api calls via console
  * **/
-function testFun() {
+function testArtistDetails() {
     var id = "084308bd-1654-436f-ba03-df6697104e19";
     $.ajax({
         url: "/API/artistDetails",

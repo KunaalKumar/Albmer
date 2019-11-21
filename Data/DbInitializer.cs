@@ -1,9 +1,5 @@
 ﻿using Albmer.Models;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace Albmer.Data
 {
@@ -12,7 +8,7 @@ namespace Albmer.Data
         public static void Initialize(CacheContext context)
         {
             context.Database.EnsureCreated();
-            //context.Database.Migrate();
+            context.Database.Migrate();
         }
     }
 }

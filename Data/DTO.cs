@@ -54,10 +54,8 @@ namespace Albmer.Data
     {
         [JsonProperty("begin")]
         public string begin { get; set; }
-        [JsonProperty("end")]
-        public string end { get; set; }
         [JsonProperty("ended")]
-        public bool ended { get; set; }
+        public string ended { get; set; }
     }
 
     public class MBAlbum
