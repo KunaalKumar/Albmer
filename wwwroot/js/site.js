@@ -28,6 +28,17 @@ $('#search-form').submit(function (e)
         });
 });
 
+
+$(document).ready(function () {
+    $.ajax({
+        url: "/API/ScrapeAlbumChart",
+        method: "GET",
+        success: function () {
+            console.log("billboard albums scraped");
+        }
+    });
+});
+
 /**
  * Function to test api calls via console
  * **/

@@ -1,10 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
 using Albmer.Data;
 using Albmer.Models;
+using AngleSharp.Html.Dom;
+using AngleSharp.Html.Parser;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -147,5 +150,24 @@ namespace Albmer.Controllers
                 return Json(new { success = false, result = "Error: " + e });
             }
         }
+
+        [HttpGet]
+        public JsonResult ScrapeAlbumChart()
+        {
+            string topAlbumsUrl = "https://www.billboard.com/charts/current-albums";
+            HttpClient httpClient = new HttpClient();
+           
+            HttpResponseMessage request = client.GetAsync(topAlbumsUrl).Result;
+
+            Stream response = request.Content.ReadAsStreamAsync().Result;
+
+            HtmlParser parser = new HtmlParser();
+            IHtmlDocument document = parser.ParseDocument(response);
+           
+            return Json(new { success = true });
+        }
+
+        
+    
     }
 }
