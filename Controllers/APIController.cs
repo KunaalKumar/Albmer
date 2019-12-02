@@ -14,6 +14,12 @@ using Newtonsoft.Json.Linq;
 
 namespace Albmer.Controllers
 {
+    public class Billboard_Album
+    {
+       public string Title { get; set; }
+       public string Artist { get; set; }
+    }
+
     public class APIController : Controller
     {
 
@@ -155,7 +161,7 @@ namespace Albmer.Controllers
         public JsonResult ScrapeAlbumChart()
         {
             string topAlbumsUrl = "https://www.billboard.com/charts/current-albums";
-            HttpClient httpClient = new HttpClient();
+            Billboard_Album[] topAlbums = new Billboard_Album[100];
            
             HttpResponseMessage request = client.GetAsync(topAlbumsUrl).Result;
 
@@ -163,8 +169,34 @@ namespace Albmer.Controllers
 
             HtmlParser parser = new HtmlParser();
             IHtmlDocument document = parser.ParseDocument(response);
-           
-            return Json(new { success = true });
+            AngleSharp.Dom.IHtmlCollection<AngleSharp.Dom.IElement> albums = document.GetElementsByClassName("chart-list-item__first-row chart-list-item__cursor-pointer");
+
+            for(int i = 0; i < albums.Length; i++)
+            {
+                string title = albums[i].GetElementsByClassName("chart-list-item__title-text")[0].TextContent.Trim();
+                string artist = "";
+
+                // Some albums have a link tag, some don't.
+                if(albums[i].GetElementsByClassName("chart-list-item__artist")[0].ChildElementCount > 0) //sometimes there is an <a> tag
+                    artist = albums[i].GetElementsByClassName("chart-list-item__artist")[0].FirstElementChild.TextContent.Trim();
+                else
+                    artist = albums[i].GetElementsByClassName("chart-list-item__artist")[0].TextContent.Trim();
+
+                var ab = new Billboard_Album
+                {
+                    Title = title,
+                    Artist = artist
+
+                };
+                topAlbums[i] = ab;
+                
+            }
+
+            return Json(new
+            {
+                success = true,
+                albums = topAlbums
+            });
         }
 
         
