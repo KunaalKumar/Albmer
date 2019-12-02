@@ -36,7 +36,6 @@ $('#billboard-top-album').ready(function () {
     }).done(function (response) {
         console.log(response);
         for (let i = 0; i < 100; i++) {
-            console.log(response.albums[i]);
             $('#billboard-top-album > tbody:last-child').append('<tr><td>'+(i+1)+'</td><td>' + response.albums[i].title + '</td><td>' + response.albums[i].artist + '</td></tr>');
         }
     })
