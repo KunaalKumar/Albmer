@@ -62,6 +62,8 @@ Get a list of results matching given query
 ```
 
 ## Failure Response Example
+```json
+{
 	"success": false,
 	"result": "No result found matching query"
 }

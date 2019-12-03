@@ -35,33 +35,49 @@ namespace Albmer.Controllers
         [HttpGet]
         public JsonResult searchArtist(string name)
         {
-            try
+            if (_context.Artists.Where(artist => artist.Name.ToLower().Equals(name.ToLower())).FirstOrDefault() != null) // Exists in cache
             {
-                HttpResponseMessage response = client.GetAsync("https://musicbrainz.org/ws/2/artist?query=" + name + "&fmt=json").Result;
-                response.EnsureSuccessStatusCode();
-                string responseBody = response.Content.ReadAsStringAsync().Result;
-                MusicBrainzArtistSearchResult result = JsonConvert.DeserializeObject<MusicBrainzArtistSearchResult>(responseBody);
-                if (result.artists.Count > 0)
+                return Json(new { });
+            } 
+            else
+            {
+                try
                 {
-                    var data = result.artists.Select(artist => new
+                    HttpResponseMessage response = client.GetAsync("https://musicbrainz.org/ws/2/artist?query=" + name + "&fmt=json").Result;
+                    response.EnsureSuccessStatusCode();
+                    string responseBody = response.Content.ReadAsStringAsync().Result;
+                    MusicBrainzArtistSearchResult result = JsonConvert.DeserializeObject<MusicBrainzArtistSearchResult>(responseBody);
+                    if (result.artists.Count > 0)
                     {
-                        artist.id,
-                        artist.name,
-                        artist.score,
-                        artist.country,
-                        artist.tags,
-                        artist.begin_area,
-                        artist.life_span
-                    });
-                    return Json(new { success = true, result = data });
+                        List<Object> data = null;
+                        bool foundPossibleMatch = false;
+                        foreach (MBArtist artist in result.artists) 
+                        {
+                            var dbArtist = new Artist { ID = artist.id, Name = artist.name, Type = artist.type, BeginYear = artist.life_span.begin, EndYear = artist.life_span.ended};
+                            _context.Artists.AddAsync(dbArtist);
+                            if (artist.score >= 95 && foundPossibleMatch == false)
+                            {
+                                foundPossibleMatch = true;
+                                data.Clear();
+                                data.Add(new { artist.id, artist.name });
+                            }
+                            else 
+                            {
+                                data.Add(new { artist.id, artist.name });
+                            }
+                        }
+                        _context.SaveChangesAsync();
+                        return Json(new { success = true, result = data });
+                    }
+                    else
+                        return Json(new { success = false, result = "No result found matching query" });
                 }
-                else
-                    return Json(new { success = false, result = "No result found matching query" });
+                catch (HttpRequestException e)
+                {
+                    return Json(new { success = false, result = "Error: " + e });
+                }
             }
-            catch (HttpRequestException e)
-            {
-                return Json(new { success = false, result = "Error: " + e});
-            }
+          
         }
 
         [HttpGet]
