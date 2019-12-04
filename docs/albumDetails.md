@@ -9,37 +9,38 @@ Get album details based on given id
 * `id=[string]`
 	* Album id to query
 
+**RESULT** :
+* success: bool
+* result: object
+	* title: string
+	* id: string
+	* artist: object
+		* id: string
+		* name: string
+	* track_count: int
+	* allmusic: string
+	* discogs: string
+	* rate_your_music: string
+
 ## Success Response Example
 ```json
 {
   "success": true,
-  "title": "Kerplunk!",
-  "release-date": "1992-01-07",
-  "artist-id": "084308bd-1654-436f-ba03-df6697104e19",
-  "tracks": [
-    {
-      "number": 1,
-      "id": "1aa427e7-6ebe-31bd-90f8-6b544f484926",
-      "length": 144440,
-      "title": "2000 Light Years Away"
-    },
-    {
-      "number": 2,
-      "id": "3138e9eb-78b1-4dd0-80a4-bf6fb6a7e9a8",
-      "length": 150000,
-      "title": "One for the Razorbacks"
-    }
-  ],
-  "urls": [
-    {
-      "type": "allmusic",
-      "id": "mw0000096356"
-    },
-    {
-      "type": "discogs",
-      "id": "33172"
-    }
-  ]
+  "result": {
+    "title": "Kerplunk!",
+    "image": null,
+    "id": "a0603694-2422-3a40-b946-d0bcea5e8254",
+    "artists": [
+      {
+        "artistId": "084308bd-1654-436f-ba03-df6697104e19",
+        "name": "Green Day"
+      }
+    ],
+    "track_count": 0,
+    "allmusic": "https://www.allmusic.com/album/mw0000096356",
+    "discogs": "https://www.discogs.com/master/33172",
+    "rate_your_music": "https://rateyourmusic.com/release/album/green_day/kerplunk/"
+  }
 }
 ```
 

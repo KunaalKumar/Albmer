@@ -234,7 +234,7 @@ namespace Albmer.Controllers
                 return Json(new
                 {
                     success = true,
-                    result = DetailedArtistToAnon(artist)
+                    result = detailedArtistToAnon(artist)
                 });
             }
             else
@@ -290,11 +290,11 @@ namespace Albmer.Controllers
                         // Add album relations
                         foreach (ReleaseGroup release in result.albums)
                         {
-                            var album = _context.Albums.Where(album => album.ID == release.id).FirstOrDefault();
+                            var album = _context.Albums.Where(album => album.ID.Equals(release.id)).FirstOrDefault();
                             if (album == null)
                             {
                                 album = new Album { ID = release.id, Title = release.title, Date = release.release_date};
-                                _context.Add(album);
+                                _context.Albums.Add(album);
                                 _context.SaveChanges();
                             }
 
@@ -322,7 +322,123 @@ namespace Albmer.Controllers
                         _context.Artists.Update(artist);
                         await _context.SaveChangesAsync();
 
-                        return Json(new { success = true, result = DetailedArtistToAnon(artist) });
+                        return Json(new { success = true, result = detailedArtistToAnon(artist) });
+                    }
+                    else
+                        return Json(new { success = false, result = "No result found matching query" });
+                }
+                catch (HttpRequestException e)
+                {
+                    return Json(new { success = false, result = "Error: " + e });
+                }
+            }
+        }
+
+        [HttpGet]
+        public async Task<JsonResult> albumDetailsAsync(string id)
+        {
+            var album = _context.Albums.Where(album => album.ID.Equals(id))
+                .Include(album => album.ArtistAlbum)
+                .ThenInclude(aa => aa.Artist)
+                .FirstOrDefault();
+            if (album != null && isDetailedAlbum(album)) // Exists in cache
+            {
+                return Json(new
+                {
+                    success = true,
+                    result = detailedAlbumToAnon(album)
+                });
+            }
+            else
+            {
+                try
+                {
+                    HttpResponseMessage response = client.GetAsync("https://musicbrainz.org/ws/2/release-group/" + id + "?fmt=json&inc=url-rels%20releases").Result;
+                    response.EnsureSuccessStatusCode();
+                    string responseBody = response.Content.ReadAsStringAsync().Result;
+                    ReleaseGroupDetails result = JsonConvert.DeserializeObject<ReleaseGroupDetails>(responseBody);
+                    if (result.error == null)
+                    {
+                        if (album == null)
+                        {
+                            album = new Album { ID = id, Title = result.title};
+                            _context.Albums.Add(album);
+                            _context.SaveChanges();
+                        }
+
+                        //TODO: Make seperate request for image
+                        //album.Image = result.relations.Where(relation => relation.type.Equals("image"))
+                        //    .Select(relation => relation.url.resource)
+                        //    .FirstOrDefault();
+
+                        album.AllMusic = result.relations.Where(relation => relation.type.Equals("allmusic"))
+                            .Select(relation => relation.url.resource)
+                            .FirstOrDefault();
+
+                        album.Discogs = result.relations.Where(relation => relation.type.Equals("discogs"))
+                            .Select(relation => relation.url.resource)
+                            .FirstOrDefault();
+
+                        album.RateYourMusic = result.relations.Where(relation => relation.type.Equals("other databases") && relation.url.resource.Contains("rateyourmusic.com"))
+                            .Select(relation => relation.url.resource)
+                            .FirstOrDefault();
+
+                        // Get release id for next call
+                        string releaseId = result.releases[0].id; // Should never crash since there is always at least 1 release
+                        for (int i = 0; i < result.releases.Count; i++)
+                        {
+                            if (result.releases[i].date.Equals(result.releaseDate))
+                            {
+                                releaseId = result.releases[i].id;
+                                break;
+                            }
+                        }
+
+                        // Call to get artist relations and songs
+                        response = client.GetAsync("https://musicbrainz.org/ws/2/release/" + releaseId + "?fmt=json&inc=release-groups%20recordings%20artists").Result;
+                        response.EnsureSuccessStatusCode();
+                        responseBody = response.Content.ReadAsStringAsync().Result;
+                        ReleaseDetails releaseResult = JsonConvert.DeserializeObject<ReleaseDetails>(responseBody);
+                        if(releaseResult.error == null)
+                        {
+                            foreach (ArtistSub2 rel in releaseResult.artist_credits)
+                            {
+                                var artist = _context.Artists.Where(artist => artist.ID.Equals(rel.artist.id)).FirstOrDefault();
+                                if (artist == null)
+                                {
+                                    artist = new Artist { ID = rel.artist.id, Name = rel.artist.name };
+                                    _context.Artists.Add(artist);
+                                    _context.SaveChanges();
+                                }
+
+                                // Only add relation if it doesn't exist
+                                bool exists = false;
+                                foreach (ArtistAlbum relations in album.ArtistAlbum)
+                                {
+                                    if (relations.ArtistId.Equals(artist.ID))
+                                    {
+                                        exists = true;
+                                        break;
+                                    }
+                                }
+                                if (!exists) // Doesn't exist, Add relation
+                                {
+                                    ArtistAlbum newRelation = new ArtistAlbum { Artist = artist, ArtistId = artist.ID, Album = album, AlbumId = album.ID };
+                                    artist.ArtistAlbum.Add(newRelation);
+                                    album.ArtistAlbum.Add(newRelation);
+
+                                    _context.Artists.Update(artist);
+                                    _context.SaveChanges();
+                                }
+                            }
+
+                            _context.Albums.Update(album);
+                            await _context.SaveChangesAsync();
+
+                            return Json(new { success = true, result = detailedAlbumToAnon(album) });
+                        }
+                        else 
+                            return Json(new { success = false, result = "Unexpected error getting artist details" });
                     }
                     else
                         return Json(new { success = false, result = "No result found matching query" });
@@ -347,7 +463,19 @@ namespace Albmer.Controllers
             return false;
         }
 
-        private Object DetailedArtistToAnon(Artist artist) 
+        private bool isDetailedAlbum(Album album)
+        {
+            if (album.RateYourMusic != null ||
+                album.Discogs != null ||
+                album.AllMusic != null ||
+                album.Image != null)
+            {
+                return true;
+            }
+            return false;
+        }
+
+        private Object detailedArtistToAnon(Artist artist) 
         {
             return (new
             { 
@@ -362,6 +490,21 @@ namespace Albmer.Controllers
                 allmusic = artist.AllMusic,
                 discogs = artist.Discogs,
                 rate_your_music = artist.RateYourMusic
+            });
+        }
+
+        private Object detailedAlbumToAnon(Album album)
+        {
+            return (new
+            { 
+                title = album.Title,
+                image = album.Image,
+                id = album.ID,
+                artists = album.ArtistAlbum.Select(m => new { id = m.ArtistId, m.Artist.Name}),
+                track_count = album.TrackCount,
+                allmusic = album.AllMusic,
+                discogs = album.Discogs,
+                rate_your_music = album.RateYourMusic
             });
         }
 

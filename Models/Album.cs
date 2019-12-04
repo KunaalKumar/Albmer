@@ -17,6 +17,10 @@ namespace Albmer.Models
         public string Date { get; set; }
         public int TrackCount { get; set; }
         public string Genre { get; set; }
+        public string AllMusic { get; set; }
+        public string Discogs { get; set; }
+        public string RateYourMusic { get; set; }
+
 
         public List<ArtistAlbum> ArtistAlbum { get; } = new List<ArtistAlbum>();
     }

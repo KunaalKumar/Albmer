@@ -81,14 +81,6 @@ namespace Albmer.Data
         public ArtistSub1 artist { get; set; }
     }
 
-    public class ArtistSub1
-    {
-        [JsonProperty("id")]
-        public string id { get; set; }
-        [JsonProperty("name")]
-        public string name { get; set; }
-    }
-
     public class ArtistDetails
     {
         [JsonProperty("error")]
@@ -103,6 +95,48 @@ namespace Albmer.Data
         public List<Relation> relations { get; set; }
         [JsonProperty("release-groups")]
         public List<ReleaseGroup> albums { get; set; }
+    }
+
+    public class ReleaseDetails
+    {
+        [JsonProperty("error")]
+        public string error { get; set; }
+        [JsonProperty("artist-credit")]
+        public List<ArtistSub2> artist_credits { get; set; }
+    }
+    public class ArtistSub2
+    {
+        [JsonProperty("artist")]
+        public ArtistSub1 artist { get; set; }
+    }
+    public class ArtistSub1
+    {
+        [JsonProperty("id")]
+        public string id { get; set; }
+        [JsonProperty("name")]
+        public string name { get; set; }
+    }
+
+    public class ReleaseGroupDetails
+    {
+        [JsonProperty("error")]
+        public string error { get; set; }
+        [JsonProperty("title")]
+        public string title { get; set; }
+        [JsonProperty("relations")]
+        public List<Relation> relations { get; set; }
+        [JsonProperty("first-release-date")]
+        public string releaseDate { get; set; }
+        [JsonProperty("releases")]
+        public List<ReleaseRel> releases;
+    }
+
+    public class ReleaseRel
+    {
+        [JsonProperty("date")]
+        public string date { get; set; }
+        [JsonProperty("id")]
+        public string id { get; set; }
     }
 
     public class Relation
