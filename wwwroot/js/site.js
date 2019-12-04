@@ -28,19 +28,6 @@ $('#search-form').submit(function (e)
         });
 });
 
-
-$('#billboard-top-album').ready(function () {
-    $.ajax({
-        url: "/API/ScrapeAlbumChart",
-        method: "GET",
-    }).done(function (response) {
-        console.log(response);
-        for (let i = 0; i < 100; i++) {
-            $('#billboard-top-album > tbody:last-child').append('<tr><td>'+(i+1)+'</td><td>' + response.albums[i].title + '</td><td>' + response.albums[i].artist + '</td></tr>');
-        }
-    })
-});
-
 /**
  * Function to test api calls via console
  * **/
