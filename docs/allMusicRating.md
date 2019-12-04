@@ -13,9 +13,9 @@ Get allmusic album ratings from given id
 ```json
 {
   "success": true,
-  "site-rating": 8,
-  "user-rating": 4,
-  "max-rating": 10
+  "site_rating": 8,
+  "user_rating": 4,
+  "max_rating": 10
 }
 ```
 

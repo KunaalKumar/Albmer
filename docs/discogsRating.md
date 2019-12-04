@@ -14,8 +14,8 @@ Get discogs album ratings from given id
 {
   "success": true,
   "rating": 4.22,
-  "max-rating": 5,
-  "number-of-ratings": 671 
+  "max_rating": 5,
+  "number_of_ratings": 671 
 }
 ```
 
