@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
+using System.Text;
 using System.Threading.Tasks;
 using Albmer.Data;
 using Albmer.Models;
@@ -35,9 +36,16 @@ namespace Albmer.Controllers
         [HttpGet]
         public JsonResult searchArtist(string name)
         {
-            if (_context.Artists.Where(artist => artist.Name.ToLower().Equals(name.ToLower())).FirstOrDefault() != null) // Exists in cache
+            List<Object> data = new List<Object>();
+            var cachedResult = _context.Artists.Where(artist => artist.Name.ToLower().Equals(name.ToLower())).FirstOrDefault();
+            if (cachedResult != null) // Exists in cache
             {
-                return Json(new { });
+                data.Add(cachedResult);
+                return Json(new 
+                { 
+                    success = true, 
+                    result = data
+                });
             } 
             else
             {
@@ -49,22 +57,19 @@ namespace Albmer.Controllers
                     MusicBrainzArtistSearchResult result = JsonConvert.DeserializeObject<MusicBrainzArtistSearchResult>(responseBody);
                     if (result.artists.Count > 0)
                     {
-                        List<Object> data = null;
-                        bool foundPossibleMatch = false;
                         foreach (MBArtist artist in result.artists) 
                         {
-                            var dbArtist = new Artist { ID = artist.id, Name = artist.name, Type = artist.type, BeginYear = artist.life_span.begin, EndYear = artist.life_span.ended};
-                            _context.Artists.AddAsync(dbArtist);
-                            if (artist.score >= 95 && foundPossibleMatch == false)
-                            {
-                                foundPossibleMatch = true;
-                                data.Clear();
-                                data.Add(new { artist.id, artist.name });
-                            }
-                            else 
-                            {
-                                data.Add(new { artist.id, artist.name });
-                            }
+                            var dbArtist = new Artist { ID = artist.id, 
+                                Name = artist.name, Type = artist.type, 
+                                BeginYear = artist.life_span.begin, 
+                                EndYear = artist.life_span.ended,
+                                Origin = artist.begin_area != null ? artist.begin_area.name : null,
+                                Genre = artist.tags != null ? tagsListToString(artist.tags) : null
+                            };
+
+                            _context.Artists.AddAsync(dbArtist); // Cache results to db
+                            
+                            data.Add(mbArtistToAnon(artist));
                         }
                         _context.SaveChangesAsync();
                         return Json(new { success = true, result = data });
@@ -77,7 +82,45 @@ namespace Albmer.Controllers
                     return Json(new { success = false, result = "Error: " + e });
                 }
             }
-          
+        }
+
+        private string tagsListToString(List<SubName> tags) 
+        {
+            StringBuilder sb = new StringBuilder();
+            foreach (SubName tag in tags) 
+            {
+                sb.Append(tag.name).Append(", ");
+            }
+ 
+            return sb.ToString()[0..^2];
+        }
+
+        // Used to parse MBArtist to pass off as json
+        private Object mbArtistToAnon(MBArtist artist) 
+        {
+            return (new 
+            { 
+                artist.id,
+                artist.name,
+                origin = artist.begin_area != null ? artist.begin_area.name : null, 
+                genre = artist.tags != null ? tagsListToString(artist.tags) : null, 
+                begin_year = artist.life_span.begin, 
+                end_year = artist.life_span.ended 
+            });
+        }
+
+        // Parse Artist to formatted object for json
+        private Object cachedArtistToAnon(Artist artist)
+        {
+            return (new
+            { 
+                id = artist.ID,
+                name = artist.Name,
+                origin = artist.Origin,
+                begin_year = artist.BeginYear,
+                end_year = artist.EndYear,
+                genre = artist.Genre
+            });
         }
 
         [HttpGet]
