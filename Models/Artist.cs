@@ -20,6 +20,10 @@ namespace Albmer.Models
         public string EndYear { get; set; }
         public string Origin { get; set; }
         public string Genre { get; set; }
+        public string OfficialWebsite { get; set; }
+        public string AllMusic { get; set; }
+        public string Discogs { get; set; }
+        public string RateYourMusic { get; set; }
 
         public List<ArtistAlbum> ArtistAlbum { get; } = new List<ArtistAlbum>();
     }

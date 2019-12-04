@@ -5,6 +5,8 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Migrations\20191204062848_AddArtistUrls.cs" />
+    <Compile Remove="Migrations\20191204062848_AddArtistUrls.Designer.cs" />
     <Compile Remove="Models\MusicBrainzModel.cs" />
   </ItemGroup>
   <ItemGroup>
