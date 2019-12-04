@@ -12,56 +12,34 @@ Get a list of results matching given query
 
 **RETURN**<br>
 * success: bool
-* result: object
-	* artist: array
-		* id: string
-		* score: int
-		* name: string
-		* country: string
-		* begin_area: object
-			* name: string
-		* life_span: object
-			* begin: string
-			* ended: string
-		* tags: array
-			* name: string
+* result: array 
+	* id: string
+	* name: string
+	* origin: string
+	* begin_year: string
+	* end_year: string
+	* genre: string
 
 ## Success Response Example
 ```json
 {
   "success": true,
-  "result": {
-    "artists": [
+  "result": [
       {
         "id": "084308bd-1654-436f-ba03-df6697104e19",
-        "score": 100,
         "name": "Green Day",
-        "country": "US",
-        "begin_area": {
-          "name": "Berkeley"
-        },
-        "life_span": {
-          "begin": "1989",
-          "ended": null
-        },
-        "tags": [
-          {
-            "name": "rock"
-          },
-          {
-            "name": "alternative rock"
-          },
-          {
-            "name": "punk"
-          }
-        ]
+        "origin": "Berkeley",
+		"begin_year": "1982",
+		"end_year": null,
+		"genre": "punk, pop, rock, reggae"
       }
     ]
-  }
 }
 ```
 
 ## Failure Response Example
+```json
+{
 	"success": false,
 	"result": "No result found matching query"
 }
