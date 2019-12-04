@@ -31,6 +31,7 @@ Get a list of results matching given query
         "origin": "Berkeley",
 		"begin_year": "1982",
 		"end_year": null,
+		"genre": "punk, pop, rock, reggae"
       }
     ]
 }
