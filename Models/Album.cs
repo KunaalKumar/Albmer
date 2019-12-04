@@ -18,6 +18,6 @@ namespace Albmer.Models
         public int TrackCount { get; set; }
         public string Genre { get; set; }
 
-        ICollection<Artist> Artists { get; set; }
+        public List<ArtistAlbum> Artists { get; set; }
     }
 }

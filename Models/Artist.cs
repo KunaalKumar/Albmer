@@ -21,6 +21,6 @@ namespace Albmer.Models
         public string Origin { get; set; }
         public string Genre { get; set; }
 
-        public ICollection<Album> Albums { get; set; }
+        public List<ArtistAlbum> Albums { get; set; }
     }
 }
