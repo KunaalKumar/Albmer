@@ -197,8 +197,7 @@ namespace Albmer.Controllers
                                 _context.Albums.Add(dbAlbum);
                             }
 
-                            _context.SaveChanges();
-                            Album al = _context.Albums.Include(album => album.ArtistAlbum).FirstOrDefault();
+                            await _context.SaveChangesAsync();
 
                             data.Add(mbAlbumToAnon(album));
                         }
