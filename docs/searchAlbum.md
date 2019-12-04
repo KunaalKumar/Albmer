@@ -7,22 +7,18 @@ Get a list of album releases matching given query
 
 **PARAMETERS**<br>
 * `name=[string]`
-	* Name of album to query
+	* Name of albumto query
 
 **RESULT**<br>
 * success: bool
 * result: object
-	* albums: array
+	* id: string
+	* track_count: int
+	* title: string
+	* artist_credit: array
 		* id: string
-		* score: int
-		* count: int
-		* title: string
-		* artist_credit: array
-			* artist: object
-				* id: string
-				* name: string
-		* tags: array
-			* name: string
+		* name: string
+	* genre: string 
 
 ## Success Response Example
 ```json
@@ -32,25 +28,15 @@ Get a list of album releases matching given query
     "albums": [
       {
         "id": "37608ff2-3168-3e7c-a77e-04a4b7300c1b",
-        "score": 100,
-        "count": 13,
+        "track_count": 13,
         "title": "21st Century Breakdown",
         "artist_credit": [
           {
-            "artist": {
-              "id": "084308bd-1654-436f-ba03-df6697104e19",
-              "name": "Green Day"
-            }
+            "id": "084308bd-1654-436f-ba03-df6697104e19",
+            "name": "Green Day"
           }
         ],
-        "tags": [
-          {
-            "name": "rock"
-          },
-          {
-            "name": "punk"
-          }
-        ]
+        "tags": "rock, punk"
       }
     ]
   }

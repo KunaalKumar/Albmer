@@ -3,14 +3,16 @@ using Albmer.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace Albmer.Migrations
 {
     [DbContext(typeof(CacheContext))]
-    partial class CacheContextModelSnapshot : ModelSnapshot
+    [Migration("20191204054630_RenameMany")]
+    partial class RenameMany
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

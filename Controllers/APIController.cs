@@ -11,7 +11,8 @@ using AngleSharp.Html.Dom;
 using AngleSharp.Html.Parser;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
+using Microsoft.EntityFrameworkCore;
+using System.Linq;
 
 namespace Albmer.Controllers
 {
@@ -34,11 +35,11 @@ namespace Albmer.Controllers
         }
 
         [HttpGet]
-        public JsonResult searchArtist(string name)
+        public async Task<JsonResult> searchArtistAsync(string name)
         {
             List<Object> data = new List<Object>();
             var cachedResult = _context.Artists.Where(artist => artist.Name.ToLower().Equals(name.ToLower())).FirstOrDefault();
-            if (cachedResult != null) // Exists in cache
+            if (cachedResult != null && cachedResult.Type != null) // Exists in cache and has detailed information
             {
                 data.Add(cachedResult);
                 return Json(new 
@@ -67,11 +68,19 @@ namespace Albmer.Controllers
                                 Genre = artist.tags != null ? tagsListToString(artist.tags) : null
                             };
 
-                            _context.Artists.AddAsync(dbArtist); // Cache results to db
-                            
+                            /* Add or update block */
+                            var cachedPoss = _context.Artists.Where(artist => artist.ID == dbArtist.ID).FirstOrDefault();
+                            if (cachedPoss != null) 
+                            {
+                                _context.Remove(cachedPoss);
+                                await _context.SaveChangesAsync();
+                            }
+                            await _context.Artists.AddAsync(dbArtist); // Cache results to db
+                            /****/
+
                             data.Add(mbArtistToAnon(artist));
                         }
-                        _context.SaveChangesAsync();
+                        await _context.SaveChangesAsync();
                         return Json(new { success = true, result = data });
                     }
                     else
@@ -86,6 +95,11 @@ namespace Albmer.Controllers
 
         private string tagsListToString(List<SubName> tags) 
         {
+            if (tags == null) 
+            {
+                return null;
+            }
+
             StringBuilder sb = new StringBuilder();
             foreach (SubName tag in tags) 
             {
@@ -124,33 +138,92 @@ namespace Albmer.Controllers
         }
 
         [HttpGet]
-        public JsonResult searchAlbum(string name)
+        public async Task<JsonResult> searchAlbumAsync(string name)
         {
-            try
+            List<Object> data = new List<Object>();
+            var cachedResult = _context.Albums.Where(artist => artist.Title.ToLower().Equals(name.ToLower())).FirstOrDefault();
+            if (cachedResult != null) // Exists in cache
             {
-                HttpResponseMessage response = client.GetAsync("http://musicbrainz.org/ws/2/release-group/?query=" + name + "%20AND%20type:album&fmt=json").Result;
-                response.EnsureSuccessStatusCode();
-                string responseBody = response.Content.ReadAsStringAsync().Result;
-                MusicBrainzAlbumSearchResult result = JsonConvert.DeserializeObject<MusicBrainzAlbumSearchResult>(responseBody);
-                if (result.release_groups.Count > 0)
+                data.Add(cachedResult);
+                return Json(new
                 {
-                    var data = result.release_groups.Select(album => new
-                    {
-                        album.id,
-                        album.title,
-                        album.score,
-                        album.artist_credit,
-                        album.tags
-                    });
-                    return Json(new { success = true, result = data });
-                }
-                else
-                    return Json(new { success = false, result = "No result found matching query" });
+                    success = true,
+                    result = data
+                });
             }
-            catch (HttpRequestException e)
+            else 
             {
-                return Json(new { success = false, result = "Error: " + e });
+                try
+                {
+                    HttpResponseMessage response = client.GetAsync("http://musicbrainz.org/ws/2/release-group/?query=" + name + "%20AND%20type:album&fmt=json").Result;
+                    response.EnsureSuccessStatusCode();
+                    string responseBody = response.Content.ReadAsStringAsync().Result;
+                    MusicBrainzAlbumSearchResult result = JsonConvert.DeserializeObject<MusicBrainzAlbumSearchResult>(responseBody);
+                    if (result.release_groups.Count > 0)
+                    {
+                        // Cache
+                        foreach (MBAlbum album in result.release_groups)
+                        {
+                            var dbAlbum = new Album
+                            {
+                                ID = album.id,
+                                Title = album.title,
+                                TrackCount = album.count,
+                                Genre = tagsListToString(album.tags)
+                            };
+
+                            foreach (ArtistCredit credit in album.artist_credit)
+                            {
+                                // Add artist to cache if not in cache
+                                var artistPoss = _context.Artists.Where(artist => artist.ID == credit.artist.id).FirstOrDefault();
+                                Artist artist = null;
+                                if (artistPoss == null) 
+                                {
+                                    artist = new Artist { ID = credit.artist.id, Name = credit.artist.name };
+                                    _context.Artists.Add(artist);
+                                }
+                                if (artist == null) 
+                                {
+                                    artist = _context.Artists.Where(artist => artist.ID == credit.artist.id).First();
+                                }
+                                // Add relations to artist and album entities
+                                ArtistAlbum rel = new ArtistAlbum 
+                                { 
+                                    Artist = artist,
+                                    Album = dbAlbum
+                                };
+                                dbAlbum.ArtistAlbum.Add(rel);
+
+                                _context.Albums.Add(dbAlbum);
+                            }
+
+                            _context.SaveChanges();
+                            Album al = _context.Albums.Include(album => album.ArtistAlbum).FirstOrDefault();
+
+                            data.Add(mbAlbumToAnon(album));
+                        }
+                        return Json(new { success = true, result = data });
+                    }
+                    else
+                        return Json(new { success = false, result = "No result found matching query" });
+                }
+                catch (HttpRequestException e)
+                {
+                    return Json(new { success = false, result = "Error: " + e });
+                }
             }
+        }
+
+        private Object mbAlbumToAnon(MBAlbum album)
+        {
+            return (new
+            { 
+                album.id,
+                album.title,
+                track_count = album.count,
+                artists = album.artist_credit.Select(credit => new { credit.artist.name, credit.artist.id}),
+                genre = tagsListToString(album.tags)
+            });
         }
 
         [HttpGet]

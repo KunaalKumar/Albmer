@@ -20,13 +20,13 @@ namespace Albmer.Models
             // Artist to album relation
             modelBuilder.Entity<ArtistAlbum>()
                 .HasOne(rel => rel.Artist)
-                .WithMany(artist => artist.Albums)
+                .WithMany(artist => artist.ArtistAlbum)
                 .HasForeignKey(rel => rel.ArtistId);
 
             // Album to artist relation
             modelBuilder.Entity<ArtistAlbum>()
                 .HasOne(rel => rel.Album)
-                .WithMany(album => album.Artists)
+                .WithMany(album => album.ArtistAlbum)
                 .HasForeignKey(rel => rel.AlbumId);
         }
     }
