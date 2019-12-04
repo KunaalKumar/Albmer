@@ -14,8 +14,8 @@ Get RateYourMuisc album ratings from given partial
 {
   "success": true,
   "rating": 3.14,
-  "max-rating": 5,
-  "number-of-ratings": 3051
+  "max_rating": 5,
+  "number_of_ratings": 3051
 }
 ```
 
