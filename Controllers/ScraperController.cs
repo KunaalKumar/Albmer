@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Web;
 using AngleSharp.Html.Dom;
@@ -22,15 +23,28 @@ namespace Albmer.Controllers
             return View();
         }
 
-        [HttpGet]
-        public JsonResult DiscogsRatings(string id)
+        private JsonResult FailRetuenJson()
         {
-            /* fail status result */
-            var failReturn = Json(new
+            return Json(new
             {
                 success = false,
                 response = "Given id is invalid"
             });
+        }
+
+        private JsonResult FailRetuenJson(string test)
+        {
+            return Json(new
+            {
+                success = false,
+                response = "Given id is invalid",
+                info = test
+            });
+        }
+
+        [HttpGet]
+        public JsonResult DiscogsRatings(string id)
+        {
 
             /* base URL */
             string discogsURL = "https://www.discogs.com/master/";
@@ -51,11 +65,11 @@ namespace Albmer.Controllers
                 /* check if the number is valid */
                 if (!float.TryParse(rateValueString, out float rateValue))
                 {
-                    return failReturn;
+                    return FailRetuenJson();
                 }
                 if (!int.TryParse(rateCountString, out int rateCount))
                 {
-                    return failReturn;
+                    return FailRetuenJson();
                 }
 
                 /* return result follow the guide: https://github.com/KunaalKumar/Albmer/blob/master/docs/discogsRating.md */
@@ -68,36 +82,127 @@ namespace Albmer.Controllers
                 });
 
             } else { /* if can't get result */
-                return failReturn;
+                return FailRetuenJson();
             }
 
         }
 
         [HttpGet]
-        public JsonResult RateYourMuiscRatings(string partial)
+        public JsonResult RateYourMusicRatings(string partial)
         {
-            /* fail status result */
-            var failReturn = Json(new
-            {
-                success = false,
-                response = "Given id is invalid"
-            });
+            string rymURL = "https://rateyourmusic.com/release/album/";
+            string url = rymURL + partial;
 
             /* base URL */
-            string rymURL = "https://rateyourmusic.com/release/album/";
-            HttpResponseMessage response = client.GetAsync(rymURL + partial).Result;
+            /* example: https://rateyourmusic.com/release/album/green-day/39_smooth/ */
+            HttpResponseMessage response = client.GetAsync(url).Result;
 
             if (response.StatusCode == HttpStatusCode.OK) /* if return status is 200 */
             {
+                string responseContent = response.Content.ReadAsStringAsync().Result;
 
+                /* Refer: https://stackoverflow.com/questions/7824138/how-to-grab-elements-by-class-or-id-in-html-source-in-c */
+                HtmlDocument doc = new HtmlDocument();
+                doc.LoadHtml(responseContent);
+                HtmlNode rateValueNode = doc.DocumentNode.SelectSingleNode("//*[@class=\"avg_rating\"]");
+                HtmlNode rateMaxNode = doc.DocumentNode.SelectSingleNode("//*[@class=\"max_rating\"]");
+                HtmlNode rateCountNode = doc.DocumentNode.SelectSingleNode("//*[@class=\"num_ratings\"]");
+                string rateValueString = (rateValueNode == null) ? "Error, rating_value not found" : rateValueNode.InnerHtml;
+                string rateMaxString = (rateMaxNode == null) ? "Error, rating_value not found" : rateMaxNode.InnerHtml;
+                string rateCountString = (rateCountNode == null) ? "Error, rating_count not found" : rateCountNode.InnerHtml;
+
+                /* check if the number is valid */
+                rateValueString = Regex.Replace(rateValueString, @"\s+", "");
+                if (!float.TryParse(rateValueString, out float rateValue))
+                {
+                    return FailRetuenJson("1");
+                }
+                rateCountString = Regex.Replace(rateCountString, @"\s+", "");
+                if (!int.TryParse(rateCountString, out int rateCount))
+                {
+                    return FailRetuenJson("2");
+                }
+                rateMaxString = Regex.Replace(rateMaxString, @"\s+", "");
+                if (!int.TryParse(rateMaxString, out int rateMax))
+                {
+                    return FailRetuenJson("3");
+                }
+
+                /* return result follow the guide: https://github.com/KunaalKumar/Albmer/blob/master/docs/discogsRating.md */
+                return Json(new
+                {
+                    success = true,
+                    rating = rateValue,
+                    max_rating = rateMax,
+                    number_of_ratings = rateCount
+                });
             } else
             {
-                return failReturn;
+                return FailRetuenJson("4");
             }
-
-            return Json(new { success = true });
         }
 
+
+        [HttpGet]
+        public JsonResult AllMusicRatings(string id)
+        {
+            string rymURL = "https://www.allmusic.com/album/";
+            string url = rymURL + id;
+
+            /* base URL */
+            HttpResponseMessage response = client.GetAsync(url).Result;
+
+            if (response.StatusCode == HttpStatusCode.OK) /* if return status is 200 */
+            {
+                string responseContent = response.Content.ReadAsStringAsync().Result;
+
+                /* Refer: https://stackoverflow.com/questions/7824138/how-to-grab-elements-by-class-or-id-in-html-source-in-c */
+                HtmlDocument doc = new HtmlDocument();
+                doc.LoadHtml(responseContent);
+
+                HttpResponseMessage request = client.GetAsync(url).Result;
+
+                Stream responses = request.Content.ReadAsStreamAsync().Result;
+
+                HtmlParser parser = new HtmlParser();
+                IHtmlDocument document = parser.ParseDocument(responses);
+                AngleSharp.Dom.IElement allMusicRateElement = document.GetElementsByClassName("allmusic-rating")[0];
+                AngleSharp.Dom.IElement userRateElement = document.GetElementsByClassName("average-user-rating")[0];
+
+                string siteRateString = allMusicRateElement.TextContent.Trim();
+                return FailRetuenJson(userRateElement.ClassList.ToString());
+
+                string userRateString = userRateElement.ClassList[1].Trim();
+                userRateString = userRateString.Substring(userRateString.Length - 1);
+
+                /* check if the number is valid */
+                if (!float.TryParse(siteRateString, out float siteRate))
+                {
+                    return FailRetuenJson(siteRateString);
+                }
+                if (!int.TryParse(userRateString, out int userRate))
+                {
+                    return FailRetuenJson(userRateString);
+                }
+
+                return Json(new
+                {
+                    success = true,
+                    site_rating = siteRate,
+                    user_rating = userRate,
+                    max_rating = 8
+                });
+            }
+            else
+            {
+                return FailRetuenJson();
+            }
+        }
+
+
+
+   /*
+         
         [HttpGet]
         public JsonResult AllMusicRatings(string musicBrainzId, string albumName)
         {
@@ -127,7 +232,7 @@ namespace Albmer.Controllers
             });
         }
 
-
+    */
         [HttpGet]
         public JsonResult ScrapeAlbumChart()
         {
@@ -169,6 +274,8 @@ namespace Albmer.Controllers
                 albums = topAlbums
             });
         }
+
+
 
     }
 }
