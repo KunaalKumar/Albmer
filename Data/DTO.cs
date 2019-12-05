@@ -4,9 +4,7 @@ using Newtonsoft.Json;
 
 namespace Albmer.Data
 {
-    /**
-     * The following classes are to serialize and deserialize MusicBrainz API responses
-     */
+    /*** The following classes are to serialize and deserialize MusicBrainz API responses ***/
     public class MusicBrainzArtistSearchResult
     {
         public DateTime created { get; set; }
@@ -43,7 +41,6 @@ namespace Albmer.Data
         public LifeSpan life_span { get; set; }
     }
 
-    // Any sub property where all that is needed is the "name"
     public class SubName
     {
         [JsonProperty("name")]
@@ -170,5 +167,21 @@ namespace Albmer.Data
         public string title { get; set; }
         [JsonProperty("first-release-date")]
         public string release_date { get; set; }
+    }
+
+    /*** The following classes are to serialize and deserialize CoverArtArchive responses ***/
+
+    public class CoverArtResult
+    {
+        [JsonProperty("images")]
+        public List<CoverImages> images { get; set; }
+    }
+
+    public class CoverImages
+    {
+        [JsonProperty("front")]
+        public bool isFront { get; set; }
+        [JsonProperty("image")]
+        public string image { get; set; }
     }
 }

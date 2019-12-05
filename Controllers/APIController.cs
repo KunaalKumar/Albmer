@@ -9,7 +9,6 @@ using Albmer.Models;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using Microsoft.EntityFrameworkCore;
-using System.Linq;
 
 namespace Albmer.Controllers
 {
@@ -57,23 +56,31 @@ namespace Albmer.Controllers
                     {
                         foreach (MBArtist artist in result.artists) 
                         {
-                            var dbArtist = new Artist { ID = artist.id, 
-                                Name = artist.name, Type = artist.type, 
-                                BeginYear = artist.life_span.begin, 
-                                EndYear = artist.life_span.ended,
-                                Origin = artist.begin_area != null ? artist.begin_area.name : null,
-                                Genre = artist.tags != null ? tagsListToString(artist.tags) : null
-                            };
-
-                            /* Add or update block */
-                            var cachedPoss = _context.Artists.Where(artist => artist.ID == dbArtist.ID).FirstOrDefault();
-                            if (cachedPoss != null) 
+                            // Check to see if already exists in dataabse
+                            bool isArtistInDatabase = true;
+                            var dbArtist = _context.Artists.Where(al => al.ID.Equals(artist.id)).FirstOrDefault();
+                            if (dbArtist == null)
                             {
-                                _context.Remove(cachedPoss);
-                                await _context.SaveChangesAsync();
+                                isArtistInDatabase = false;
+                                dbArtist = new Artist
+                                {
+                                    ID = artist.id,
+                                    Name = artist.name,
+                                    Type = artist.type,
+                                    BeginYear = artist.life_span.begin,
+                                    EndYear = artist.life_span.ended,
+                                    Origin = artist.begin_area != null ? artist.begin_area.name : null,
+                                    Genre = artist.tags != null ? tagsListToString(artist.tags) : null
+                                };
+
                             }
-                            await _context.Artists.AddAsync(dbArtist); // Cache results to db
-                            /****/
+
+                            if (isArtistInDatabase)
+                            {
+                                _context.Artists.Update(dbArtist);
+                            }
+                            else
+                                await _context.Artists.AddAsync(dbArtist);
 
                             data.Add(mbArtistToAnon(artist));
                         }
@@ -161,13 +168,20 @@ namespace Albmer.Controllers
                         // Cache
                         foreach (MBAlbum album in result.release_groups)
                         {
-                            var dbAlbum = new Album
+                            // Check to see if already exists in dataabse
+                            bool isAlbumInDatabase = true;
+                            Album dbAlbum = _context.Albums.Where(al => al.ID.Equals(album.id)).FirstOrDefault();
+                            if (dbAlbum == null)
                             {
-                                ID = album.id,
-                                Title = album.title,
-                                TrackCount = album.count,
-                                Genre = tagsListToString(album.tags)
-                            };
+                                isAlbumInDatabase = false;
+                                dbAlbum = new Album
+                                {
+                                    ID = album.id,
+                                    Title = album.title,
+                                    TrackCount = album.count,
+                                    Genre = tagsListToString(album.tags)
+                                };
+                            }
 
                             foreach (ArtistCredit credit in album.artist_credit)
                             {
@@ -193,7 +207,12 @@ namespace Albmer.Controllers
                                 _context.Artists.Update(artist);
                             }
 
-                            await _context.Albums.AddAsync(dbAlbum);
+                            if (isAlbumInDatabase)
+                            {
+                                _context.Albums.Update(dbAlbum);
+                            } else
+                                await _context.Albums.AddAsync(dbAlbum);
+
                             await _context.SaveChangesAsync();
 
                             data.Add(mbAlbumToAnon(album));
@@ -366,11 +385,6 @@ namespace Albmer.Controllers
                             _context.SaveChanges();
                         }
 
-                        //TODO: Make seperate request for image
-                        //album.Image = result.relations.Where(relation => relation.type.Equals("image"))
-                        //    .Select(relation => relation.url.resource)
-                        //    .FirstOrDefault();
-
                         album.AllMusic = result.relations.Where(relation => relation.type.Equals("allmusic"))
                             .Select(relation => relation.url.resource)
                             .FirstOrDefault();
@@ -383,7 +397,7 @@ namespace Albmer.Controllers
                             .Select(relation => relation.url.resource)
                             .FirstOrDefault();
 
-                        // Get release id for next call
+                        // Get release id for next calls
                         string releaseId = result.releases[0].id; // Should never crash since there is always at least 1 release
                         for (int i = 0; i < result.releases.Count; i++)
                         {
@@ -392,6 +406,17 @@ namespace Albmer.Controllers
                                 releaseId = result.releases[i].id;
                                 break;
                             }
+                        }
+
+                        //TODO: Make seperate request for image
+                        response = client.GetAsync("http://coverartarchive.org/release/" + releaseId).Result;
+                        response.EnsureSuccessStatusCode();
+                        responseBody = response.Content.ReadAsStringAsync().Result;
+                        CoverArtResult artResult = JsonConvert.DeserializeObject<CoverArtResult>(responseBody);
+                        foreach (CoverImages image in artResult.images)
+                        {
+                            if (image.isFront)
+                                album.Image = image.image;
                         }
 
                         // Call to get artist relations and songs
