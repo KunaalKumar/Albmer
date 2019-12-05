@@ -154,7 +154,10 @@ namespace Albmer.Controllers
             name = regex.Replace(name.Trim(), " ");
 
             List<Object> data = new List<Object>();
-            var cachedResult = _context.Albums.Where(album => album.Title.ToLower().Contains(name.ToLower())).ToList();
+            var cachedResult = _context.Albums.Where(album => album.Title.ToLower().Contains(name.ToLower()))
+                .Include(album => album.ArtistAlbum)
+                .ThenInclude(aa => aa.Artist)
+                .ToList();
             if (cachedResult.Count > 0) // Exists in cache
             {
                 data.AddRange(cachedResult);
@@ -481,7 +484,7 @@ namespace Albmer.Controllers
 
         private bool isDetailedArtist(Artist artist)
         {
-            if(artist.OfficialWebsite != null || 
+            if(artist.OfficialWebsite != null ||
                 artist.RateYourMusic != null ||
                 artist.Discogs != null ||
                 artist.AllMusic != null ||
@@ -537,89 +540,37 @@ namespace Albmer.Controllers
             });
         }
 
-        //[HttpGet]
-        //public async Task<JsonResult> matchAlbum(string artistName, string albumName)
-        //{
-        //    List<Object> data = new List<Object>();
-        //    var cachedResults = _context.Albums.Where(album => album.Title.ToLower().Equals(albumName.ToLower()))
-        //        .Select(album => album.ArtistAlbum).ToList();
-        //    foreach (List<ArtistAlbum> rels in cachedResults)
-        //    {
-        //        foreach (ArtistAlbum rel in rels) 
-        //        {
-        //            if (rel.Artist.Name.ToLower().Equals(artistName.ToLower()))
-        //                return artistDet;
-        //        }
-        //    }
-        //    if (cachedResult != null) // Exists in cache
-        //    {
-        //        data.Add(cachedResult);
-        //        return Json(new
-        //        {
-        //            success = true,
-        //            result = data
-        //        });
-        //    }
-        //    else
-        //    {
-        //        try
-        //        {
-        //            HttpResponseMessage response = client.GetAsync("http://musicbrainz.org/ws/2/release-group/?query=" + name + "%20AND%20type:album&fmt=json").Result;
-        //            response.EnsureSuccessStatusCode();
-        //            string responseBody = response.Content.ReadAsStringAsync().Result;
-        //            MusicBrainzAlbumSearchResult result = JsonConvert.DeserializeObject<MusicBrainzAlbumSearchResult>(responseBody);
-        //            if (result.release_groups.Count > 0)
-        //            {
-        //                // Cache
-        //                foreach (MBAlbum album in result.release_groups)
-        //                {
-        //                    var dbAlbum = new Album
-        //                    {
-        //                        ID = album.id,
-        //                        Title = album.title,
-        //                        TrackCount = album.count,
-        //                        Genre = tagsListToString(album.tags)
-        //                    };
-
-        //                    foreach (ArtistCredit credit in album.artist_credit)
-        //                    {
-        //                        // Add artist to cache if not in cache
-        //                        var artistPoss = _context.Artists.Where(artist => artist.ID == credit.artist.id).FirstOrDefault();
-        //                        Artist artist = null;
-        //                        if (artistPoss == null)
-        //                        {
-        //                            artist = new Artist { ID = credit.artist.id, Name = credit.artist.name };
-        //                            _context.Artists.Add(artist);
-        //                        }
-        //                        if (artist == null)
-        //                        {
-        //                            artist = _context.Artists.Where(artist => artist.ID == credit.artist.id).First();
-        //                        }
-        //                        // Add relations to artist and album entities
-        //                        ArtistAlbum rel = new ArtistAlbum
-        //                        {
-        //                            Artist = artist,
-        //                            Album = dbAlbum
-        //                        };
-        //                        dbAlbum.ArtistAlbum.Add(rel);
-
-        //                        _context.Albums.Add(dbAlbum);
-        //                    }
-
-        //                    await _context.SaveChangesAsync();
-
-        //                    data.Add(mbAlbumToAnon(album));
-        //                }
-        //                return Json(new { success = true, result = data });
-        //            }
-        //            else
-        //                return Json(new { success = false, result = "No result found matching query" });
-        //        }
-        //        catch (HttpRequestException e)
-        //        {
-        //            return Json(new { success = false, result = "Error: " + e });
-        //        }
-        //    }
-        //}
+        [HttpGet]
+        public JsonResult matchAlbum(string artistName, string albumName)
+        {
+            if (String.IsNullOrEmpty(artistName) || String.IsNullOrEmpty(albumName))
+            {
+                return Json(new { success = false, result = "Supply both artistName and albumName" });
+            }
+            dynamic result = ((dynamic)searchAlbumAsync(albumName).Result.Value).result;
+            foreach (Album album in result)
+            {
+                if (album.Title.Equals(albumName)) // Abum name matches
+                {
+                    foreach (ArtistAlbum rel in album.ArtistAlbum)
+                    {
+                        if (rel.Artist.Name.ToLower().Equals(artistName.ToLower())) // Artist matches
+                        {
+                            if (isDetailedAlbum(album)) // If isn't detailed album, call API/albumDetails
+                            {
+                                return Json(new { success = true, album.Title, artist_name = rel.Artist.Name, album.AllMusic, album.Discogs, album.RateYourMusic });
+                            }
+                            else
+                            {
+                                dynamic detailedAlbum = ((dynamic)albumDetailsAsync(album.ID).Result.Value).result;
+                                return Json(new { success = true, detailedAlbum.title, artist_name = rel.Artist.Name, 
+                                    detailedAlbum.allmusic, detailedAlbum.discogs, rate_your_music = detailedAlbum.rate_your_music });
+                            }
+                        }
+                    }
+                }
+            }
+            return Json(new { success = false, result = "Failed to find a match" });
+        }
     }
 }
