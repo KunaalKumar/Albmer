@@ -18,3 +18,7 @@ Albmer will scrape various music related sites for album reviews and ratings. Th
 * [Get RateYourMusic Album Rating](docs/rateYourMusicRating.md): `GET /scraper/rateYourMuiscRatings`
 * [Get Pitchfork Album Rating](docs/pitchforkRating.md): `GET /scraper/pitchforkRatings`
 * [Get Metacritic Album Rating](docs/metacriticRating.md): `GET /scraper/metacriticRatings`
+
+### Billboard Album Matcher
+> This endpoint will be used to get review urls for albums in the Billboard charts
+* [Match Album](docs/matchAlbum.md): `GET /API/matchAlbum`
