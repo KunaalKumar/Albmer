@@ -9,6 +9,7 @@ using Albmer.Models;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using Microsoft.EntityFrameworkCore;
+using System.Text.RegularExpressions;
 
 namespace Albmer.Controllers
 {
@@ -33,9 +34,13 @@ namespace Albmer.Controllers
         [HttpGet]
         public async Task<JsonResult> searchArtistAsync(string name)
         {
+            // Remove whitespace from start and end; Replace successive white spaces with a single white space
+            Regex regex = new Regex("[ ]{2,}", RegexOptions.None);
+            name = regex.Replace(name.Trim(), " ");
+
             List<Object> data = new List<Object>();
-            var cachedResult = _context.Artists.Where(artist => artist.Name.ToLower().Equals(name.ToLower())).FirstOrDefault();
-            if (cachedResult != null && cachedResult.Type != null) // Exists in cache and has detailed information
+            var cachedResult = _context.Artists.Where(artist => artist.Name.ToLower().Contains(name.ToLower())).ToList();
+            if (cachedResult.Count > 0) // Exists in cache
             {
                 data.Add(cachedResult);
                 return Json(new 
@@ -144,11 +149,15 @@ namespace Albmer.Controllers
         [HttpGet]
         public async Task<JsonResult> searchAlbumAsync(string name)
         {
+            // Remove whitespace from start and end; Replace successive white spaces with a single white space
+            Regex regex = new Regex("[ ]{2,}", RegexOptions.None);
+            name = regex.Replace(name.Trim(), " ");
+
             List<Object> data = new List<Object>();
-            var cachedResult = _context.Albums.Where(album => album.Title.ToLower().Equals(name.ToLower())).FirstOrDefault();
-            if (cachedResult != null) // Exists in cache
+            var cachedResult = _context.Albums.Where(album => album.Title.ToLower().Contains(name.ToLower())).ToList();
+            if (cachedResult.Count > 0) // Exists in cache
             {
-                data.Add(cachedResult);
+                data.AddRange(cachedResult);
                 return Json(new
                 {
                     success = true,
@@ -165,15 +174,12 @@ namespace Albmer.Controllers
                     MusicBrainzAlbumSearchResult result = JsonConvert.DeserializeObject<MusicBrainzAlbumSearchResult>(responseBody);
                     if (result.release_groups.Count > 0)
                     {
-                        // Cache
                         foreach (MBAlbum album in result.release_groups)
                         {
                             // Check to see if already exists in dataabse
-                            bool isAlbumInDatabase = true;
                             Album dbAlbum = _context.Albums.Where(al => al.ID.Equals(album.id)).FirstOrDefault();
                             if (dbAlbum == null)
                             {
-                                isAlbumInDatabase = false;
                                 dbAlbum = new Album
                                 {
                                     ID = album.id,
@@ -181,6 +187,8 @@ namespace Albmer.Controllers
                                     TrackCount = album.count,
                                     Genre = tagsListToString(album.tags)
                                 };
+                                _context.Albums.Add(dbAlbum);
+                                _context.SaveChanges();
                             }
 
                             foreach (ArtistCredit credit in album.artist_credit)
@@ -190,7 +198,8 @@ namespace Albmer.Controllers
                                 if (artist == null) 
                                 {
                                     artist = new Artist { ID = credit.artist.id, Name = credit.artist.name };
-                                    await _context.Artists.AddAsync(artist);
+                                    _context.Artists.Add(artist);
+                                    _context.SaveChanges();
                                 }
 
                                 // Add relations to artist and album entities
@@ -207,12 +216,7 @@ namespace Albmer.Controllers
                                 _context.Artists.Update(artist);
                             }
 
-                            if (isAlbumInDatabase)
-                            {
-                                _context.Albums.Update(dbAlbum);
-                            } else
-                                await _context.Albums.AddAsync(dbAlbum);
-
+                            _context.Albums.Update(dbAlbum);
                             await _context.SaveChangesAsync();
 
                             data.Add(mbAlbumToAnon(album));
