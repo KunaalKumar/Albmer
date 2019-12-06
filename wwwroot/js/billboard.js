@@ -12,10 +12,13 @@ function getBillboardResults() {
                 //getLinks(response.albums[i].artist, response.albums[i].title, i);
                 let art = response.albums[i].artist;
                 let tit = response.albums[i].title;
+                let type = "&search=" + "Album";
+                let input = "name= " + tit;
+                let albumRef = '/Home/SearchResults/?' + input + type;
                 //getLinks(response.albums[i].artist, response.albums[i].title);
                 //$('#billboard-top-album > tbody:last-child').append('<tr><td>'+(i+1)+'</td><td>'+tit+'</td><td>'+art+'</td><td><button onclick="getReviews(\''+art+'\',\''+tit+'\')"> Get Reviews </button></td></tr>');
                 //$('#billboard-top-album > tbody:last-child').append('<tr><td>' + (i + 1) + '</td><td>' + tit + '</td><td>' + art + '</td><td><button id="'+tit+'" class="'+art+'"onclick="getReviews(this.class, this.id)"> Get Reviews </button></td></tr>');
-                $('#billboard-top-album > tbody:last-child').append('<tr><td>' + (i + 1) + '</td><td>' + tit + '</td><td>' + art + '</td><td><button id="row_' + i + '" class="' + art + '" data-title="' + tit + '"onClick="searchAlbum(this)"> Search Album </button></td></tr>');
+                $('#billboard-top-album > tbody:last-child').append('<tr><td>' + (i + 1) + '</td><td><a href="'+albumRef+'">' + tit + '</a></td><td>' + art + '</td><td></tr>');
             }
         })
     });
