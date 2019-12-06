@@ -34,7 +34,7 @@ function getSearchResults() {
             } else {
                 if ($('#type').text() === 'Artist') {
                     for (let i = 0; i < response.result[0].length; i++) {
-                        let artistRef = "/Details/Artist/?name=" + response.result[0][i].id;
+                        let artistRef = "/Details/Artist/?id=" + response.result[0][i].id;
                         $('#search-results > tbody:last-child').append('<tr><td><a href=' + artistRef + '>' + response.result[0][i].name + '</a></td><tr>');
                     }
                 } else {
