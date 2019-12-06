@@ -8,8 +8,8 @@ function getBillboardResults() {
             url: "/Scraper/ScrapeAlbumChart",
             method: "GET",
         }).done(function (response) {
-            for (let i = 0; i < 100; i++) {
-                getLinks(response.albums[i].artist, response.albums[i].title);
+            for (let i = 0; i < 10; i++) {
+                //getLinks(response.albums[i].artist, response.albums[i].title, i);
                 $('#billboard-top-album > tbody:last-child').append('<tr><td>' + (i + 1) + '</td><td>' + response.albums[i].title + '</td><td>' + response.albums[i].artist + '</td></tr>');
             }
         })
@@ -17,20 +17,7 @@ function getBillboardResults() {
     
 }
 
-function allMusicScaperTest() {
-    $.ajax({
-        url: "/Scraper/AllMusicRatings",
-        method: "GET",
-        data: {
-            musicBrainzId: 'mw0000096356',
-            albumName: 'Kerplunk!'
-        }
-    }).done(function (response) {
-        console.log(response);
-    })
-}
-
-function getLinks(artist, album) {
+function getLinks(artist, album, num) {
     $.ajax({
         url: "/API/matchAlbum",
         method: "GET",
@@ -39,6 +26,6 @@ function getLinks(artist, album) {
             albumName: album
         }
     }).done(function (response) {
-        console.log(response);
+        console.log(num + ") " + response.result);
     })
 }

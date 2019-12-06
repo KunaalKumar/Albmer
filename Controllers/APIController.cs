@@ -182,7 +182,8 @@ namespace Albmer.Controllers
             {
                 try
                 {
-                    HttpResponseMessage response = client.GetAsync("http://musicbrainz.org/ws/2/release-group/?query=" + name + "%20AND%20type:album&fmt=json").Result;
+                    var url = "http://musicbrainz.org/ws/2/release-group/?query=%22" + name.Replace(" ", "%20") +"%22%20AND%20type:album&fmt=json";
+                    HttpResponseMessage response = client.GetAsync(url).Result;
                     response.EnsureSuccessStatusCode();
                     string responseBody = response.Content.ReadAsStringAsync().Result;
                     MusicBrainzAlbumSearchResult result = JsonConvert.DeserializeObject<MusicBrainzAlbumSearchResult>(responseBody);
@@ -208,7 +209,7 @@ namespace Albmer.Controllers
                             foreach (ArtistCredit credit in album.artist_credit)
                             {
                                 // Add artist to cache if not in cache
-                                Artist artist = _context.Artists.Where(artist => artist.ID == credit.artist.id).FirstOrDefault();
+                                Artist artist = _context.Artists.Where(artist => artist.ID.Equals(credit.artist.id)).FirstOrDefault();
                                 if (artist == null) 
                                 {
                                     artist = new Artist { ID = credit.artist.id, Name = credit.artist.name };
@@ -225,14 +226,10 @@ namespace Albmer.Controllers
                                     AlbumId = dbAlbum.ID
                                 };
                                 dbAlbum.ArtistAlbum.Add(rel);
-                                artist.ArtistAlbum.Add(rel);
-
-                                _context.Artists.Update(artist);
                             }
 
                             _context.Albums.Update(dbAlbum);
-                            _context.SaveChanges();
-
+                                _context.SaveChanges();
                             data.Add(mbAlbumToAnon(album));
                         }
                         return Json(new { success = true, result = data });
@@ -295,19 +292,6 @@ namespace Albmer.Controllers
                             .Select(relation => relation.url.resource)
                             .FirstOrDefault();
 
-                        if (artist.Type.ToLower().Equals("group"))
-                        {
-                            // TODO: Add band members to database
-                            //var band_memebers = result.relations.Where(relation => relation.type.Equals("member of band"))
-                            //                        .Select(relation => new
-                            //                        {
-                            //                            relation.artist.id,
-                            //                            relation.artist.name,
-                            //                            start_year = relation.begin,
-                            //                            end_year = relation.end
-                            //                        });
-                        }
-
                         artist.OfficialWebsite = result.relations.Where(relation => relation.type.Equals("official homepage"))
                             .Select(relation => relation.url.resource)
                             .FirstOrDefault();
@@ -349,9 +333,7 @@ namespace Albmer.Controllers
                             {
                                 ArtistAlbum rel = new ArtistAlbum { Artist = artist, ArtistId = artist.ID, Album = album, AlbumId = album.ID };
                                 artist.ArtistAlbum.Add(rel);
-                                album.ArtistAlbum.Add(rel);
 
-                                _context.Albums.Update(album); // Update album with new relations
                                 _context.SaveChanges();
                             }
                         }
