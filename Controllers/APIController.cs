@@ -32,7 +32,7 @@ namespace Albmer.Controllers
         }
 
         [HttpGet]
-        public async Task<JsonResult> searchArtistAsync(string name)
+        public JsonResult searchArtist(string name)
         {
             // Remove whitespace from start and end; Replace successive white spaces with a single white space
             Regex regex = new Regex("[ ]{2,}", RegexOptions.None);
@@ -85,11 +85,11 @@ namespace Albmer.Controllers
                                 _context.Artists.Update(dbArtist);
                             }
                             else
-                                await _context.Artists.AddAsync(dbArtist);
+                                _context.Artists.Add(dbArtist);
 
                             data.Add(mbArtistToAnon(artist));
                         }
-                        await _context.SaveChangesAsync();
+                        _context.SaveChanges();
                         return Json(new { success = true, result = data });
                     }
                     else
@@ -147,7 +147,7 @@ namespace Albmer.Controllers
         }
 
         [HttpGet]
-        public async Task<JsonResult> searchAlbumAsync(string name)
+        public JsonResult searchAlbum(string name)
         {
             // Remove whitespace from start and end; Replace successive white spaces with a single white space
             Regex regex = new Regex("[ ]{2,}", RegexOptions.None);
@@ -231,7 +231,7 @@ namespace Albmer.Controllers
                             }
 
                             _context.Albums.Update(dbAlbum);
-                            await _context.SaveChangesAsync();
+                            _context.SaveChanges();
 
                             data.Add(mbAlbumToAnon(album));
                         }
@@ -260,7 +260,7 @@ namespace Albmer.Controllers
         }
 
 [HttpGet]
-        public async Task<JsonResult> artistDetailsAsync(string id)
+        public JsonResult artistDetails(string id)
         {
             var artist = _context.Artists.Where(artist => artist.ID.Equals(id))
                 .Include(artist => artist.ArtistAlbum)
@@ -357,7 +357,7 @@ namespace Albmer.Controllers
                         }
 
                         _context.Artists.Update(artist);
-                        await _context.SaveChangesAsync();
+                        _context.SaveChanges();
 
                         return Json(new { success = true, result = detailedArtistToAnon(artist) });
                     }
@@ -372,7 +372,7 @@ namespace Albmer.Controllers
         }
 
         [HttpGet]
-        public async Task<JsonResult> albumDetailsAsync(string id)
+        public JsonResult albumDetails(string id)
         {
             var album = _context.Albums.Where(album => album.ID.Equals(id))
                 .Include(album => album.ArtistAlbum)
@@ -484,7 +484,7 @@ namespace Albmer.Controllers
                                 }
 
                                 _context.Albums.Update(album);
-                                await _context.SaveChangesAsync();
+                                _context.SaveChanges();
 
                                 return Json(new { success = true, result = detailedAlbumToAnon(album) });
                             }
@@ -572,7 +572,7 @@ namespace Albmer.Controllers
             {
                 return Json(new { success = false, result = "Supply both artistName and albumName" });
             }
-            dynamic result = searchAlbumAsync(albumName).Result.Value;
+            dynamic result = searchAlbum(albumName).Value;
             if (!result.success)
             {
                 return Json(new { success = false, result = "Unexpected error" });
@@ -585,7 +585,7 @@ namespace Albmer.Controllers
                     {
                         if (rel.name.ToLower().Equals(artistName.ToLower())) // Artist matches
                         {
-                            dynamic detailedAlbum = albumDetailsAsync(album.id).Result.Value;
+                            dynamic detailedAlbum = albumDetails(album.id);
                             if (!detailedAlbum.success)
                             {
                                 return Json(new { success = false, result = "Unexpected error" });
