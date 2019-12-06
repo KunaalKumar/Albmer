@@ -1,26 +1,26 @@
 ﻿@{
-    ViewData["Title"] = "Album Details Page";
+    ViewData["Title"] = "Artist Details Page";
 }
 
 <script>
     window.onload = function() {
-        let name = "@Html.Raw(ViewData["id"])";
-        let dp = new detailsPage(name, "artist");
-        console.log(name);
+        let id = "@Html.Raw(ViewData["id"])";
+        let dp = new detailsPage(id, "artist");
+        console.log(id);
     }
 </script>
 
 <div class="row align-items-center">
     <div class="col-sm-4 text-center">
-        <img id="detailsPageArtist_image" src="https://imgplaceholder.com/420x320" style="width:20rem" class="rounded img-thumbnail m-2" alt="Artist/Album image">
+        <img id="detailsPageArtist_image" src="https://via.placeholder.com/300.png?text=Artist+Profile" style="width:20rem; height:20rem" class="rounded img-thumbnail m-2" alt="Artist/Album image">
     </div>
 
     <div class="col-sm-8">
-        <h1 id="detailsPageArtist_title"> Album Title </h1>
-        <h4 id="detailsPageArtist_artist"> Artist: </h4>
-        <div> All Music: <span id="allmusic_rating"></span> </div>
-        <div> Discogs: <span id="discogs_rating"></span> </div>
-        <div> Rate Your Music: <span id="rym_rating"></span> </div>
+        <h1 id="detailsPageArtist_title"> Artist Title </h1>
+        <div> Active: <span id="begin_year">N/A</span> - <span id="end_year">N/A</span> </div>
+        <div> Origin: <span id="origin">N/A</span> </div>
+        <div> Type: <span id="type">N/A</span> </div>
+        <div> Official Website: <span id="official_website">N/A</span> </div>
     </div>
 </div>
 
