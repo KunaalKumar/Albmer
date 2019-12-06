@@ -585,7 +585,7 @@ namespace Albmer.Controllers
                     {
                         if (rel.name.ToLower().Equals(artistName.ToLower())) // Artist matches
                         {
-                            dynamic detailedAlbum = albumDetails(album.id);
+                            dynamic detailedAlbum = albumDetails(album.id).Value;
                             if (!detailedAlbum.success)
                             {
                                 return Json(new { success = false, result = "Unexpected error" });
