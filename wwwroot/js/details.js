@@ -1,62 +1,74 @@
 ﻿
 /*
- * Gets top billboard albums and their ratings, builds a table row by row with the results. 
+ * Get details page by given id
  */
 
-window.onload = function(id, detailsSwitch) {
+class detailsPage {
 
-    this.getArtistDetails();
-    //this.getAlbumDetails();
+    constructor(id, detailsSwitch) {
 
-}
-
-function getArtistDetails() {
-    $.ajax({
-        url: "/API/artistDetails",
-        method: "GET",
-        data: {
-            id: "084308bd-1654-436f-ba03-df6697104e19"
-        },
-        success: function(response) {
-            console.log("getArtistDetails");
-            console.log(response);
-
-            setImage(response.result.image);
-            setTitle(response.result.name);
-        },
-        error: function() {
-            console.log('[getArtistDetails] Error occured');
+        if (detailsSwitch === "album") {
+            this.getAlbumDetails(id);
+            console.log("album: id=" + id);
+        } else if (detailsSwitch === "artist") {
+            this.getArtistDetails(id);
+            console.log("artist: id=" + id);
         }
-    });
+    }
+
+    getArtistDetails(id_input) {
+        let that = this;
+        $.ajax({
+            url: "/API/artistDetails",
+            method: "GET",
+            data: {
+                id: id_input
+            },
+            success: function(response) {
+                console.log("getArtistDetails");
+                console.log(response);
+
+                that.setImage(response.result.image);
+                that.setTitle(response.result.name);
+            },
+            error: function() {
+                console.log('[getArtistDetails] Error occured');
+            }
+        });
+    }
+
+    getAlbumDetails(id_input) {
+        let that = this;
+        $.ajax({
+            url: "/API/albumDetails",
+            method: "GET",
+            data: {
+                id: id_input
+            },
+            success: function(response) {
+                console.log("getArtistDetails");
+                console.log(response);
+
+                that.setImage(response.result.image);
+                that.setTitle(response.result.title);
+            },
+            error: function() {
+                console.log('[getAlbumDetails] Error occured');
+            }
+        });
+    }
+
+    /* image */
+    setImage(imageUrl) {
+        //console.log(imageUrl);
+        $("#detailsImage").attr("src", imageUrl);
+    }
+
+    /* text */
+    setTitle(titleStr) {
+        $("#detailsPageTitle").text(titleStr);
+    }
+
+    /* rating */
+
 }
-
-function getAlbumDetails() {
-    $.ajax({
-        url: "API/albumDetails",
-        method: "GET",
-        data: {
-            id: "a0603694-2422-3a40-b946-d0bcea5e8254"
-        }
-    }).done(function(response) {
-        console.log("getAlbumDetails");
-        console.log(response);
-        
-        setImage(response.result.image);
-        setTitle(response.result.title);
-    })
-}
-
-/* image */
-function setImage(imageUrl) {
-    //console.log(imageUrl);
-    $("#detailsImage").attr("src", imageUrl);
-}
-
-/* text */
-function setTitle(titleStr) {
-    $("#detailsPageTitle").text(titleStr);
-}
-
-/* rating */
-
-
