@@ -22,3 +22,9 @@ Albmer will scrape various music related sites for album reviews and ratings. Th
 ### Billboard Album Matcher
 > This endpoint will be used to get review urls for albums in the Billboard charts
 * [Match Album](docs/matchAlbum.md): `GET /API/matchAlbum`
+
+### Details Page
+> This is how user get details page for album and artist
+* [Details Page for Album](docs/detailsAlbum.md)
+* [Details Page for Artist](docs/detailsArtist.md)
+
