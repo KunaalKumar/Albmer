@@ -38,7 +38,7 @@ function getSearchResults() {
                     $('#search-results > tbody:last-child').append('<tr><td><a href=#>' + response.result[i].title + '</a></td> <td><a href=#>' + response.result[i].artist_credit[0].name + '<tr>');
                 }
             }
-            getDetails(response.result[17].id);
+            getDetails(response.result[0].id);
 
         })
     });

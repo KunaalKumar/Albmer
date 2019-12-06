@@ -9,34 +9,87 @@ function getBillboardResults() {
             method: "GET",
         }).done(function (response) {
             for (let i = 0; i < 100; i++) {
-                getLinks(response.albums[i].artist, response.albums[i].title);
-                $('#billboard-top-album > tbody:last-child').append('<tr><td>' + (i + 1) + '</td><td>' + response.albums[i].title + '</td><td>' + response.albums[i].artist + '</td></tr>');
+                let art = response.albums[i].artist;
+                let tit = response.albums[i].title;
+                //getLinks(response.albums[i].artist, response.albums[i].title);
+                //$('#billboard-top-album > tbody:last-child').append('<tr><td>'+(i+1)+'</td><td>'+tit+'</td><td>'+art+'</td><td><button onclick="getReviews(\''+art+'\',\''+tit+'\')"> Get Reviews </button></td></tr>');
+                //$('#billboard-top-album > tbody:last-child').append('<tr><td>' + (i + 1) + '</td><td>' + tit + '</td><td>' + art + '</td><td><button id="'+tit+'" class="'+art+'"onclick="getReviews(this.class, this.id)"> Get Reviews </button></td></tr>');
+                $('#billboard-top-album > tbody:last-child').append('<tr><td>' + (i + 1) + '</td><td>' + tit + '</td><td>' + art + '</td><td><button id="row_' + i + '" class="' + art + '" data-title="'+tit+'"onClick="getReviews(this)"> Get Reviews </button></td></tr>');
+
+
             }
         })
     });
     
 }
 
-function allMusicScaperTest() {
+
+
+function getLinks(artist, album) {
     $.ajax({
-        url: "/Scraper/AllMusicRatings",
+        url: "/API/searchAlbum",
         method: "GET",
         data: {
-            musicBrainzId: 'mw0000096356',
-            albumName: 'Kerplunk!'
+            //artistName: artist,
+            name: album
         }
     }).done(function (response) {
         console.log(response);
     })
 }
 
-function getLinks(artist, album) {
+function getReviews(e) {
+    let art = e.className;
+    let tit = e.getAttribute("data-title");
+    let row = e.id;
+
+    console.log(art + tit);
     $.ajax({
-        url: "/API/matchAlbum",
+        url: "/API/searchAlbum",
         method: "GET",
         data: {
-            artistName: artist,
-            albumName: album
+            name: art
+        }
+    }).done(function (response) {
+        for (let i = 0; i < response.result.length; i++) {
+            if ( response.result[i].artist_credit[0].name == art) {
+                getAlbumDetails(response.result[i].id, tit, row);
+                break;
+            }
+            if (i = response.result.length) {
+                unavailable(row);
+            }
+        }
+    })
+}
+
+function getAlbumDetails(mbid,tit, row) {
+    $.ajax({
+        url: "/API/albumDetails",
+        method: "GET",
+        data: { id: mbid }
+    }).done(function (response) {
+        if (!response.success) {
+            unavailable();
+        }
+        console.log(response);
+        if (response.result.allmusic) {
+            allMusicRating(response.result.allmusic);
+        }
+    })
+}
+
+function unavailable(row) {
+    console.log('unavailable');
+    $("#"+row).html("Unavailable");
+}
+
+function allMusicRating(_url) {
+    $.ajax({
+        url: "/Scraper/AllMusicRatings",
+        method: "GET",
+        data: {
+            url: _url
         }
     }).done(function (response) {
         console.log(response);

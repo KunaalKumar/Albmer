@@ -154,31 +154,31 @@ namespace Albmer.Controllers
             name = regex.Replace(name.Trim(), " ");
 
             List<Object> data = new List<Object>();
-            var cachedResult = _context.Albums.Where(album => album.Title.ToLower().Contains(name.ToLower()))
-                .Select(album => new 
-                {
-                    id = album.ID,
-                    track_count = album.TrackCount,
-                    title = album.Title,
-                    tags = album.Genre,
-                    artist_credit = album.ArtistAlbum
-                    .Select(m => new {
-                        name = m.Artist.Name,
-                        id = m.ArtistId
-                    })
-                })
-                //.ThenInclude(rel => rel.Artist)
-                .ToList();
-            if (cachedResult.Count > 0) // Exists in cache
-            {
-                data.AddRange(cachedResult);
-                return Json(new
-                {
-                    success = true,
-                    result = data
-                });
-            }
-            else 
+            //var cachedResult = _context.Albums.Where(album => album.Title.ToLower().Contains(name.ToLower()))
+            //    .Select(album => new 
+            //    {
+            //        id = album.ID,
+            //        track_count = album.TrackCount,
+            //        title = album.Title,
+            //        tags = album.Genre,
+            //        artist_credit = album.ArtistAlbum
+            //        .Select(m => new {
+            //            name = m.Artist.Name,
+            //            id = m.ArtistId
+            //        })
+            //    })
+            //    //.ThenInclude(rel => rel.Artist)
+            //    .ToList();
+            //if (cachedResult.Count > 0) // Exists in cache
+            //{
+            //    data.AddRange(cachedResult);
+            //    return Json(new
+            //    {
+            //        success = true,
+            //        result = data
+            //    });
+            //}
+           // else 
             {
                 try
                 {
@@ -190,48 +190,48 @@ namespace Albmer.Controllers
                     {
                         foreach (MBAlbum album in result.release_groups)
                         {
-                            // Check to see if already exists in dataabse
-                            Album dbAlbum = _context.Albums.Where(al => al.ID.Equals(album.id)).FirstOrDefault();
-                            if (dbAlbum == null)
-                            {
-                                dbAlbum = new Album
-                                {
-                                    ID = album.id,
-                                    Title = album.title,
-                                    TrackCount = album.count,
-                                    Genre = tagsListToString(album.tags)
-                                };
-                                _context.Albums.Add(dbAlbum);
-                                _context.SaveChanges();
-                            }
+                            //// Check to see if already exists in dataabse
+                            //Album dbAlbum = _context.Albums.Where(al => al.ID.Equals(album.id)).FirstOrDefault();
+                            //if (dbAlbum == null)
+                            //{
+                            //    dbAlbum = new Album
+                            //    {
+                            //        ID = album.id,
+                            //        Title = album.title,
+                            //        TrackCount = album.count,
+                            //        Genre = tagsListToString(album.tags)
+                            //    };
+                            //    _context.Albums.Add(dbAlbum);
+                            //    _context.SaveChanges();
+                            //}
 
                             foreach (ArtistCredit credit in album.artist_credit)
                             {
-                                // Add artist to cache if not in cache
-                                Artist artist = _context.Artists.Where(artist => artist.ID == credit.artist.id).FirstOrDefault();
-                                if (artist == null) 
-                                {
-                                    artist = new Artist { ID = credit.artist.id, Name = credit.artist.name };
-                                    _context.Artists.Add(artist);
-                                    _context.SaveChanges();
-                                }
+                                //// Add artist to cache if not in cache
+                                //Artist artist = _context.Artists.Where(artist => artist.ID == credit.artist.id).FirstOrDefault();
+                                //if (artist == null) 
+                                //{
+                                //    artist = new Artist { ID = credit.artist.id, Name = credit.artist.name };
+                                //    _context.Artists.Add(artist);
+                                //    _context.SaveChanges();
+                                //}
 
-                                // Add relations to artist and album entities
-                                ArtistAlbum rel = new ArtistAlbum 
-                                { 
-                                    Artist = artist,
-                                    ArtistId = artist.ID,
-                                    Album = dbAlbum,
-                                    AlbumId = dbAlbum.ID
-                                };
-                                dbAlbum.ArtistAlbum.Add(rel);
-                                artist.ArtistAlbum.Add(rel);
+                                //// Add relations to artist and album entities
+                                //ArtistAlbum rel = new ArtistAlbum 
+                                //{ 
+                                //    Artist = artist,
+                                //    ArtistId = artist.ID,
+                                //    Album = dbAlbum,
+                                //    AlbumId = dbAlbum.ID
+                                //};
+                                //dbAlbum.ArtistAlbum.Add(rel);
+                                //artist.ArtistAlbum.Add(rel);
 
-                                _context.Artists.Update(artist);
+                                //_context.Artists.Update(artist);
                             }
 
-                            _context.Albums.Update(dbAlbum);
-                            _context.SaveChanges();
+                            //_context.Albums.Update(dbAlbum);
+                            //_context.SaveChanges();
 
                             data.Add(mbAlbumToAnon(album));
                         }
@@ -568,35 +568,46 @@ namespace Albmer.Controllers
         [HttpGet]
         public JsonResult matchAlbum(string artistName, string albumName)
         {
-            if (String.IsNullOrEmpty(artistName) || String.IsNullOrEmpty(albumName))
+            try
             {
-                return Json(new { success = false, result = "Supply both artistName and albumName" });
-            }
-            dynamic result = searchAlbum(albumName).Value;
-            if (!result.success)
-            {
-                return Json(new { success = false, result = "Unexpected error" });
-            }
-            foreach (dynamic album in result.result)
-            {
-                if (album.title.Equals(albumName)) // Album name matches
+                if (String.IsNullOrEmpty(artistName) || String.IsNullOrEmpty(albumName))
                 {
-                    foreach (dynamic rel in album.artist_credit)
+                    return Json(new { success = false, result = "Supply both artistName and albumName" });
+                }
+                dynamic result = searchAlbum(albumName).Value;
+
+                foreach (dynamic album in result.result)
+                {
+                    if (album.title.Equals(albumName)) // Album name matches
                     {
-                        if (rel.name.ToLower().Equals(artistName.ToLower())) // Artist matches
+                        foreach (dynamic rel in album.artist_credit)
                         {
-                            dynamic detailedAlbum = albumDetails(album.id);
-                            if (!detailedAlbum.success)
+                            if (rel.name.ToLower().Equals(artistName.ToLower())) // Artist matches
                             {
-                                return Json(new { success = false, result = "Unexpected error" });
+                                dynamic detailedAlbum = albumDetails(album.id);
+                                if (!detailedAlbum.success)
+                                {
+                                    return Json(new { success = false, result = "Unexpected error" });
+                                }
+                                return Json(new
+                                {
+                                    success = true,
+                                    detailedAlbum.result.title,
+                                    artist_name = rel.name,
+                                    detailedAlbum.result.allmusic,
+                                    detailedAlbum.result.discogs,
+                                    rate_your_music = detailedAlbum.result.rate_your_music
+                                });
                             }
-                            return Json(new { success = true, detailedAlbum.result.title, artist_name = rel.name, 
-                                detailedAlbum.result.allmusic, detailedAlbum.result.discogs, rate_your_music = detailedAlbum.result.rate_your_music });
                         }
                     }
                 }
+                return Json(new { success = false, result = "Failed to find a match" });
+            }catch(Exception)
+            {
+                return Json(new { success = false, result = "Failed to find a match" });
+
             }
-            return Json(new { success = false, result = "Failed to find a match" });
         }
     }
 }

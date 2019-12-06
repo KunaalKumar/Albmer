@@ -146,91 +146,101 @@ namespace Albmer.Controllers
         }
 
 
+        //[HttpGet]
+        //public JsonResult AllMusicRatings(string id)
+        //{
+        //    string rymURL = "https://www.allmusic.com/album/";
+        //    string url = rymURL + id;
+
+        //    /* base URL */
+        //    HttpResponseMessage response = client.GetAsync(url).Result;
+
+        //    if (response.StatusCode == HttpStatusCode.OK) /* if return status is 200 */
+        //    {
+        //        string responseContent = response.Content.ReadAsStringAsync().Result;
+
+        //        /* Refer: https://stackoverflow.com/questions/7824138/how-to-grab-elements-by-class-or-id-in-html-source-in-c */
+        //        HtmlDocument doc = new HtmlDocument();
+        //        doc.LoadHtml(responseContent);
+
+        //        HttpResponseMessage request = client.GetAsync(url).Result;
+
+        //        Stream responses = request.Content.ReadAsStreamAsync().Result;
+
+        //        HtmlParser parser = new HtmlParser();
+        //        IHtmlDocument document = parser.ParseDocument(responses);
+        //        AngleSharp.Dom.IElement allMusicRateElement;
+        //        try {
+        //            allMusicRateElement = document.GetElementsByClassName("allmusic-rating")[0];
+        //        } catch(Exception e)
+        //        {
+        //            return FailRetuenJson();
+        //        }
+        //        string siteRateString = allMusicRateElement.TextContent.Trim();
+
+        //        /* check if the number is valid */
+        //        if (!float.TryParse(siteRateString, out float siteRate))
+        //        {
+        //            return FailRetuenJson(siteRateString);
+        //        }
+
+        //        return Json(new
+        //        {
+        //            success = true,
+        //            site_rating = siteRate,
+        //            max_rating = 10
+        //        });
+        //    }
+        //    else
+        //    {
+        //        return FailRetuenJson();
+        //    }
+        //}
+
+
+
+   
+         
         [HttpGet]
-        public JsonResult AllMusicRatings(string id)
+        public JsonResult AllMusicRatings(string url)
         {
-            string rymURL = "https://www.allmusic.com/album/";
-            string url = rymURL + id;
+            HttpResponseMessage request = client.GetAsync(url).Result;
 
-            /* base URL */
-            HttpResponseMessage response = client.GetAsync(url).Result;
-
-            if (response.StatusCode == HttpStatusCode.OK) /* if return status is 200 */
+            if (request.StatusCode == HttpStatusCode.OK)
             {
-                string responseContent = response.Content.ReadAsStringAsync().Result;
 
-                /* Refer: https://stackoverflow.com/questions/7824138/how-to-grab-elements-by-class-or-id-in-html-source-in-c */
-                HtmlDocument doc = new HtmlDocument();
-                doc.LoadHtml(responseContent);
-
-                HttpResponseMessage request = client.GetAsync(url).Result;
-
-                Stream responses = request.Content.ReadAsStreamAsync().Result;
+                Stream response = request.Content.ReadAsStreamAsync().Result;
 
                 HtmlParser parser = new HtmlParser();
-                IHtmlDocument document = parser.ParseDocument(responses);
-                AngleSharp.Dom.IElement allMusicRateElement;
-                try {
-                    allMusicRateElement = document.GetElementsByClassName("allmusic-rating")[0];
-                } catch(Exception e)
-                {
-                    return FailRetuenJson();
-                }
-                string siteRateString = allMusicRateElement.TextContent.Trim();
+                IHtmlDocument document = parser.ParseDocument(response);
+                AngleSharp.Dom.IElement ratingElement = document.GetElementsByClassName("allmusic-rating")[0];
 
-                /* check if the number is valid */
-                if (!float.TryParse(siteRateString, out float siteRate))
+                string rating = ratingElement.TextContent.Trim();
+                if (rating.Equals(""))
                 {
-                    return FailRetuenJson(siteRateString);
+                    rating = "No Rating Yet";
                 }
+                else
+                {
+                    rating += "/10";
+                }
+
 
                 return Json(new
                 {
                     success = true,
-                    site_rating = siteRate,
-                    max_rating = 10
+                    allMusicRating = rating
+                });
+            } else
+            {
+                return Json(new
+                {
+                    success = false,
                 });
             }
-            else
-            {
-                return FailRetuenJson();
-            }
         }
 
-
-
-   /*
-         
-        [HttpGet]
-        public JsonResult AllMusicRatings(string musicBrainzId, string albumName)
-        {
-            string baseUrl = "https://www.allmusic.com/album/";
-
-            // encode special characters, spaces should be '-' for allmusic
-            albumName.Replace(' ', '-');
-            string albumUrl = Uri.EscapeDataString(albumName.ToLower() +"-" + musicBrainzId);
-
-            string Url = baseUrl + albumUrl;
-
-            HttpResponseMessage request = client.GetAsync(Url).Result;
-
-            Stream response = request.Content.ReadAsStreamAsync().Result;
-
-            HtmlParser parser = new HtmlParser();
-            IHtmlDocument document = parser.ParseDocument(response);
-            AngleSharp.Dom.IElement ratingElement = document.GetElementsByClassName("allmusic-rating")[0];
-
-            string rating= ratingElement.TextContent.Trim();
-            rating += "/10";
-
-
-            return Json(new { 
-                success = true, 
-                allMusicRating = rating 
-            });
-        }
-
-    */
+    
         [HttpGet]
         public JsonResult ScrapeAlbumChart()
         {
