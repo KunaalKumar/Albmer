@@ -166,31 +166,26 @@ namespace Albmer.Controllers
 
                 HtmlParser parser = new HtmlParser();
                 IHtmlDocument document = parser.ParseDocument(responses);
-                AngleSharp.Dom.IElement allMusicRateElement = document.GetElementsByClassName("allmusic-rating")[0];
-                AngleSharp.Dom.IElement userRateElement = document.GetElementsByClassName("average-user-rating")[0];
-
+                AngleSharp.Dom.IElement allMusicRateElement;
+                try {
+                    allMusicRateElement = document.GetElementsByClassName("allmusic-rating")[0];
+                } catch(Exception e)
+                {
+                    return FailRetuenJson();
+                }
                 string siteRateString = allMusicRateElement.TextContent.Trim();
-                return FailRetuenJson(userRateElement.ClassList.ToString());
-
-                string userRateString = userRateElement.ClassList[1].Trim();
-                userRateString = userRateString.Substring(userRateString.Length - 1);
 
                 /* check if the number is valid */
                 if (!float.TryParse(siteRateString, out float siteRate))
                 {
                     return FailRetuenJson(siteRateString);
                 }
-                if (!int.TryParse(userRateString, out int userRate))
-                {
-                    return FailRetuenJson(userRateString);
-                }
 
                 return Json(new
                 {
                     success = true,
                     site_rating = siteRate,
-                    user_rating = userRate,
-                    max_rating = 8
+                    max_rating = 10
                 });
             }
             else
