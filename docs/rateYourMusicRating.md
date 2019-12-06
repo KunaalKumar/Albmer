@@ -6,8 +6,8 @@ Get RateYourMuisc album ratings from given partial
 **METHOD** : `GET`
 
 **Parameters** :
-* `partial=[string]`
-        * Album ratings will be fetched from https://rateyourmusic.com/release/album/[partial]
+* `url=[string]`
+        * Album ratings will be fetched from the given url
 
 ## Success Response Example
 ```json
