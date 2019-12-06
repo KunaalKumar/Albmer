@@ -164,7 +164,7 @@ namespace Albmer.Controllers
                     artist_credit = album.ArtistAlbum
                     .Select(m => new {
                         name = m.Artist.Name,
-                        m.ArtistId
+                        id = m.ArtistId
                     })
                 })
                 //.ThenInclude(rel => rel.Artist)
@@ -254,12 +254,12 @@ namespace Albmer.Controllers
                 album.id,
                 album.title,
                 track_count = album.count,
-                artists = album.artist_credit.Select(credit => new { credit.artist.name, credit.artist.id}),
-                genre = tagsListToString(album.tags)
+                artist_credit = album.artist_credit.Select(credit => new { name = credit.artist.name, id = credit.artist.id}),
+                tags = tagsListToString(album.tags)
             });
         }
 
-        [HttpGet]
+[HttpGet]
         public async Task<JsonResult> artistDetailsAsync(string id)
         {
             var artist = _context.Artists.Where(artist => artist.ID.Equals(id))
