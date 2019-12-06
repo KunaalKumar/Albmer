@@ -33,9 +33,9 @@ function getSearchResults() {
                 $('#search-results > tbody:last-child').append('<tr><td>Sorry, no search results for given search fields</td><tr>');
             } else {
                 if ($('#type').text() === 'Artist') {
-                    for (let i = 0; i < response.result[0].length; i++) {
-                        let artistRef = "/Details/Artist/?name=" + response.result[0][i].id;
-                        $('#search-results > tbody:last-child').append('<tr><td><a href=' + artistRef + '>' + response.result[0][i].name + '</a></td><tr>');
+                    for (let i = 0; i < response.result.length; i++) {
+                        let artistRef = "/Details/Artist/?name=" + response.result[i].id;
+                        $('#search-results > tbody:last-child').append('<tr><td><a href=' + artistRef + '>' + response.result[i].name + '</a></td><tr>');
                     }
                 } else {
                     for (let i = 0; i < response.result.length; i++) {
