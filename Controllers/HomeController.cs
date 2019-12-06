@@ -28,6 +28,11 @@ namespace Albmer.Controllers
             return View();
         }
 
+        public IActionResult Landing()
+        {
+            return View();
+        }
+
         public IActionResult SearchResults(string name, string search)
         {
             var sp = new SearchParameters
