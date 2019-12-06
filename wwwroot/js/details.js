@@ -29,8 +29,16 @@ class detailsPage {
                 console.log("getArtistDetails");
                 console.log(response);
 
-                that.setArtistImage(response.result.image);
+                /* artist settings */
+                //that.setArtistImage(response.result.image);
                 that.setArtistTitle(response.result.name);
+
+                /* get info */
+                that.setArtistInfo_begin_year(response.result.begin_year);
+                that.setArtistInfo_end_year(response.result.end_year);
+                that.setArtistInfo_origin(response.result.origin);
+                that.setArtistInfo_type(response.result.type);
+                that.setArtistInfo_official_website(response.result.official_website);
             },
             error: function() {
                 console.log('[getArtistDetails] Error occured');
@@ -54,20 +62,31 @@ class detailsPage {
                 that.setAlbumImage(response.result.image);
                 that.setAlbumTitle(response.result.title);
                 let listOfArtist = response.result.artists;
-                listOfArtist.forEach(function (item) {
+                let listOfArtist_noDuplicate = Array.from(new Set(listOfArtist.map(a => a.name)))
+                    .map(name => {
+                        return listOfArtist.find(a => a.name === name)
+                    })
+                console.log(listOfArtist_noDuplicate);
+                listOfArtist_noDuplicate.forEach(function (item) {
                     that.setAlbumArtist(item.name, item.id);
                 });
 
                 /* get rate */
                 let allmusic_url = response.result.allmusic;
-                let allmusic_id = allmusic_url.replace("https://www.allmusic.com/album/", "");
-                that.getAllMusicRate(allmusic_id);
+                if (allmusic_url != null) {
+                    let allmusic_id = allmusic_url.replace("https://www.allmusic.com/album/", "");
+                    that.getAllMusicRate(allmusic_id);
+                }
                 let discogs_url = response.result.discogs;
-                let discogs_id = discogs_url.replace("https://www.discogs.com/master/", "");
-                that.getDiscogsRate(discogs_id);
+                if (discogs_url != null) {
+                    let discogs_id = discogs_url.replace("https://www.discogs.com/master/", "");
+                    that.getDiscogsRate(discogs_id);
+                }
                 let rym_url = response.result.rate_your_music;
-                //let rym_id = rym_url.replace("", "");
-                that.getRYMRate(rym_url);
+                if (rym_url != null) {
+                    //let rym_id = rym_url.replace("", "");
+                    that.getRYMRate(rym_url);
+                }
             },
             error: function() {
                 console.log('[getAlbumDetails] Error occured');
@@ -147,13 +166,17 @@ class detailsPage {
     /* Artist */
     setArtistImage(imageUrl) {
         //console.log(imageUrl);
-        $("#detailsImage").attr("src", imageUrl);
+        if (imageUrl != null) {
+            $("#detailsPageArtist_image").attr("src", imageUrl);
+        }
     }
 
     /* Album */
     setAlbumImage(imageUrl) {
         //console.log(imageUrl);
-        $("#detailsPageAlbum_image").attr("src", imageUrl);
+        if (imageUrl != null) {
+            $("#detailsPageAlbum_image").attr("src", imageUrl);
+        }
     }
 
 
@@ -163,7 +186,8 @@ class detailsPage {
 
     /* Artist */
     setArtistTitle(titleStr) {
-        $("#detailsPageTitle").text(titleStr);
+        $("#detailsPageArtist_title").empty();
+        $("#detailsPageArtist_title").append("<i class=\"fas fa-user\"></i> " + titleStr);
     }
 
     /* Album */
@@ -178,10 +202,36 @@ class detailsPage {
 
 
     /*********/
-    /* rating */
+    /* others */
     /*********/
 
     /* Artist */
+    setArtistInfo_begin_year(year) {
+        if (year != null) {
+            $("#begin_year").text(year);
+        }
+    }
+    setArtistInfo_end_year(year) {
+        if (year != null) {
+            $("#end_year").text(year);
+        }
+    }
+    setArtistInfo_origin(origin) {
+        if (origin != null) {
+            $("#origin").text(origin);
+        }
+    }
+    setArtistInfo_type(type) {
+        if (type != null) {
+            $("#type").text(type);
+        }
+    }
+    setArtistInfo_official_website(url) {
+        if (url != null) {
+            $("#official_website").empty();
+            $("#official_website").append("<a href=\"" + url + "\">" + url + "</a>");
+        }
+    }
 
 
     /* Album */
