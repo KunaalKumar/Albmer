@@ -34,6 +34,10 @@ namespace Albmer.Controllers
         [HttpGet]
         public JsonResult searchArtist(string name)
         {
+            if (String.IsNullOrEmpty(name))
+            {
+                return Json(new { success = false, result = "name parameter not provided" });
+            }
             // Remove whitespace from start and end; Replace successive white spaces with a single white space
             Regex regex = new Regex("[ ]{2,}", RegexOptions.None);
             name = regex.Replace(name.Trim(), " ");
