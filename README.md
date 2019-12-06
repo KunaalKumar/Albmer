@@ -25,6 +25,5 @@ Albmer will scrape various music related sites for album reviews and ratings. Th
 
 ### Details Page
 > This is how user get details page for album and artist
-* [Details Page for Album](docs/detailsAlbum.md)
-* [Details Page for Artist](docs/detailsArtist.md)
-
+* [Details Page for Artist](docs/detailsArtist.md): `GET /Details/Artist`
+* [Details Page for Album](docs/detailsAlbum.md): `GET /Details/Album`
