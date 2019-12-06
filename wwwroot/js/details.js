@@ -28,8 +28,8 @@ class detailsPage {
                 console.log("getArtistDetails");
                 console.log(response);
 
-                that.setImage(response.result.image);
-                that.setTitle(response.result.name);
+                that.setArtistImage(response.result.image);
+                that.setArtistTitle(response.result.name);
             },
             error: function() {
                 console.log('[getArtistDetails] Error occured');
@@ -49,8 +49,10 @@ class detailsPage {
                 console.log("getArtistDetails");
                 console.log(response);
 
-                that.setImage(response.result.image);
-                that.setTitle(response.result.title);
+                /* album settings */
+                that.setAlbumImage(response.result.image);
+                that.setAlbumTitle(response.result.title);
+                that.setAlbumArtist(response.result.artists[0].name, response.result.artists[0].id);
             },
             error: function() {
                 console.log('[getAlbumDetails] Error occured');
@@ -58,17 +60,49 @@ class detailsPage {
         });
     }
 
+    /*********/
     /* image */
-    setImage(imageUrl) {
+    /*********/
+
+    /* Artist */
+    setArtistImage(imageUrl) {
         //console.log(imageUrl);
         $("#detailsImage").attr("src", imageUrl);
     }
 
+    /* Album */
+    setAlbumImage(imageUrl) {
+        //console.log(imageUrl);
+        $("#detailsPageAlbum_image").attr("src", imageUrl);
+    }
+
+
+    /*********/
     /* text */
-    setTitle(titleStr) {
+    /*********/
+
+    /* Artist */
+    setArtistTitle(titleStr) {
         $("#detailsPageTitle").text(titleStr);
     }
 
-    /* rating */
+    /* Album */
+    setAlbumTitle(titleStr) {
+        $("#detailsPageAlbum_title").text("Title: " + titleStr);
+    }
 
+    setAlbumArtist(artistStr, artistId) {
+        $("#detailsPageAlbum_artist a").text("Artist: " + artistStr);
+        $("#detailsPageAlbum_artist a").attr("href", "/Details/Artist?id=" + artistId);
+    }
+
+
+    /*********/
+    /* rating */
+    /*********/
+
+    /* Artist */
+
+
+    /* Album */
 }

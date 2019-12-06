@@ -32,7 +32,7 @@ Get album details based on given id
     "id": "a0603694-2422-3a40-b946-d0bcea5e8254",
     "artists": [
       {
-        "artistId": "084308bd-1654-436f-ba03-df6697104e19",
+        "id": "084308bd-1654-436f-ba03-df6697104e19",
         "name": "Green Day"
       }
     ],
