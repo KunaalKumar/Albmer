@@ -43,10 +43,10 @@ namespace Albmer.Controllers
             name = regex.Replace(name.Trim(), " ");
 
             List<Object> data = new List<Object>();
-            var cachedResult = _context.Artists.Where(artist => artist.Name.ToLower().Contains(name.ToLower())).ToList();
+            List<Artist> cachedResult = _context.Artists.Where(artist => artist.Name.ToLower().Contains(name.ToLower())).ToList();
             if (cachedResult.Count > 0) // Exists in cache
             {
-                data.Add(cachedResult);
+                data.AddRange(cachedResult);
                 return Json(new 
                 { 
                     success = true, 
@@ -329,24 +329,18 @@ namespace Albmer.Controllers
                         // Add album relations
                         foreach (ReleaseGroup release in result.albums)
                         {
+                            bool test = false;
                             var album = _context.Albums.Where(album => album.ID.Equals(release.id)).FirstOrDefault();
                             if (album == null)
                             {
+                                test = true;
                                 album = new Album { ID = release.id, Title = release.title, Date = release.release_date };
                                 _context.Albums.Add(album);
                                 _context.SaveChanges();
-                            }
 
-                            ArtistAlbum rel = new ArtistAlbum {ArtistId = artist.ID, AlbumId = album.ID };
-                            artist.ArtistAlbum.Add(rel);
-
-                            try
-                            {
+                                ArtistAlbum rel = new ArtistAlbum { ArtistId = artist.ID, AlbumId = album.ID };
+                                artist.ArtistAlbum.Add(rel);
                                 _context.SaveChanges();
-                            }
-                            catch (Exception e)
-                            { 
-                                // Ignore already exists
                             }
                         }
 
@@ -471,6 +465,7 @@ namespace Albmer.Controllers
                                     }
                                     catch (Exception e)
                                     {
+                                        var t = 1;
                                         // Ignore - already exists
                                     }
                                 }
