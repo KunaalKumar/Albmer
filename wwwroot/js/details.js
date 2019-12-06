@@ -24,7 +24,7 @@ class detailsPage {
             url: "/API/artistDetails",
             method: "GET",
             data: {
-                name: tmpName
+                id: tmpName
             },
             success: function(response) {
                 console.log("getArtistDetails");

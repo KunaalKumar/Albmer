@@ -332,7 +332,7 @@ namespace Albmer.Controllers
                             var album = _context.Albums.Where(album => album.ID.Equals(release.id)).FirstOrDefault();
                             if (album == null)
                             {
-                                album = new Album { ID = release.id, Title = release.title, Date = release.release_date};
+                                album = new Album { ID = release.id, Title = release.title, Date = release.release_date };
                                 _context.Albums.Add(album);
                                 _context.SaveChanges();
                             }
