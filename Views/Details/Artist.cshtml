@@ -4,7 +4,7 @@
 
 <script>
     window.onload = function() {
-        let name = "@Html.Raw(ViewData["name"])";
+        let name = "@Html.Raw(ViewData["id"])";
         let dp = new detailsPage(name, "artist");
         console.log(name);
     }

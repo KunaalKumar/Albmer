@@ -13,9 +13,9 @@ namespace Albmer.Controllers
             return View();
         }
 
-        public IActionResult Artist(string name)
+        public IActionResult Artist(string id)
         {
-            ViewData["name"] = name;
+            ViewData["id"] = id;
             return View();
         }
 

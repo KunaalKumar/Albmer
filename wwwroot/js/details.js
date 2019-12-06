@@ -5,26 +5,25 @@
 
 class detailsPage {
 
-    constructor(str, detailsSwitch) {
+    constructor(id, detailsSwitch) {
 
         if (detailsSwitch === "album") {
-            this.getAlbumDetails(str);
-            console.log("album: id=" + str);
+            this.getAlbumDetails(id);
+            console.log("album: id=" + id);
         } else if (detailsSwitch === "artist") {
-            this.getArtistDetails(str);
-            console.log("artist: name=" + str);
+            this.getArtistDetails(id);
+            console.log("artist: id=" + id);
         }
     }
 
     /* get all details */
-    getArtistDetails(name_input) {
+    getArtistDetails(id_input) {
         let that = this;
-        let tmpName = encodeURIComponent(name_input);
         $.ajax({
             url: "/API/artistDetails",
             method: "GET",
             data: {
-                name: tmpName
+                id: id_input
             },
             success: function(response) {
                 console.log("getArtistDetails");
@@ -56,7 +55,7 @@ class detailsPage {
                 that.setAlbumTitle(response.result.title);
                 let listOfArtist = response.result.artists;
                 listOfArtist.forEach(function (item) {
-                    that.setAlbumArtist(item.name, item.name);
+                    that.setAlbumArtist(item.name, item.id);
                 });
 
                 /* get rate */
@@ -173,8 +172,8 @@ class detailsPage {
         $("#detailsPageAlbum_title").append("<i class=\"fas fa-record-vinyl\"></i> " + "Title: " + titleStr);
     }
 
-    setAlbumArtist(artistStr, artistName) {
-        $("#detailsPageAlbum_artist").append("<a class=\"badge badge-primary mx-1\" href=/Details/Artist?name=" + encodeURIComponent(artistName) + " target=\"_blank\">" + artistStr + " </a>");
+    setAlbumArtist(artistStr, artistId) {
+        $("#detailsPageAlbum_artist").append("<a class=\"badge badge-primary mx-1\" href=/Details/Artist?id=" + artistId + " target=\"_blank\">" + artistStr + " </a>");
     }
 
 
