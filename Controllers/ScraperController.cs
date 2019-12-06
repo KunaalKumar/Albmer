@@ -17,6 +17,12 @@ namespace Albmer.Controllers
     public class ScraperController : Controller
     {
         private HttpClient client = new HttpClient();
+        private static string userAgent = "Albmer/1.0.0a (https://www.utah.edu/)";
+
+        public ScraperController() 
+        {
+            client.DefaultRequestHeaders.Add("User-Agent", userAgent);
+        }
 
         public IActionResult Index()
         {
@@ -88,11 +94,8 @@ namespace Albmer.Controllers
         }
 
         [HttpGet]
-        public JsonResult RateYourMusicRatings(string partial)
+        public JsonResult RateYourMusicRatings(string url)
         {
-            string rymURL = "https://rateyourmusic.com/release/album/";
-            string url = rymURL + partial;
-
             /* base URL */
             /* example: https://rateyourmusic.com/release/album/green-day/39_smooth/ */
             HttpResponseMessage response = client.GetAsync(url).Result;
@@ -105,8 +108,8 @@ namespace Albmer.Controllers
                 HtmlDocument doc = new HtmlDocument();
                 doc.LoadHtml(responseContent);
                 HtmlNode rateValueNode = doc.DocumentNode.SelectSingleNode("//*[@class=\"avg_rating\"]");
-                HtmlNode rateMaxNode = doc.DocumentNode.SelectSingleNode("//*[@class=\"max_rating\"]");
-                HtmlNode rateCountNode = doc.DocumentNode.SelectSingleNode("//*[@class=\"num_ratings\"]");
+                HtmlNode rateMaxNode = doc.DocumentNode.SelectSingleNode("//*[@class=\"max_rating\"]").SelectSingleNode(".//span");
+                HtmlNode rateCountNode = doc.DocumentNode.SelectSingleNode("//*[@class=\"num_ratings\"]").SelectSingleNode(".//b//span");
                 string rateValueString = (rateValueNode == null) ? "Error, rating_value not found" : rateValueNode.InnerHtml;
                 string rateMaxString = (rateMaxNode == null) ? "Error, rating_value not found" : rateMaxNode.InnerHtml;
                 string rateCountString = (rateCountNode == null) ? "Error, rating_count not found" : rateCountNode.InnerHtml;
@@ -117,13 +120,13 @@ namespace Albmer.Controllers
                 {
                     return FailRetuenJson("1");
                 }
-                rateCountString = Regex.Replace(rateCountString, @"\s+", "");
+                rateCountString = Regex.Replace(rateCountString, @"\s+", "").Replace(",", "");
                 if (!int.TryParse(rateCountString, out int rateCount))
                 {
                     return FailRetuenJson("2");
                 }
                 rateMaxString = Regex.Replace(rateMaxString, @"\s+", "");
-                if (!int.TryParse(rateMaxString, out int rateMax))
+                if (!double.TryParse(rateMaxString, out double rateMax))
                 {
                     return FailRetuenJson("3");
                 }
