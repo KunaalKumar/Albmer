@@ -66,7 +66,7 @@ class detailsPage {
                 let discogs_id = discogs_url.replace("https://www.discogs.com/master/", "");
                 that.getDiscogsRate(discogs_id);
                 let rym_url = response.result.rate_your_music;
-                let rym_id = rym_url.replace("", "");
+                //let rym_id = rym_url.replace("", "");
                 that.getRYMRate(rym_url);
             },
             error: function() {
@@ -118,15 +118,13 @@ class detailsPage {
             }
         });
     }
-    getRYMRate(id_input) {
-        console.log("!!!!!!!!!!!!!!!!!");
-
+    getRYMRate(url_input) {
         let that = this;
         $.ajax({
             url: "/scraper/rateYourMusicRatings",
             method: "GET",
             data: {
-                id: id_input
+                url: url_input
             },
             success: function (r) {
                 console.log("rateYourMusicRatings");

@@ -97,6 +97,10 @@ namespace Albmer.Controllers
         public JsonResult RateYourMusicRatings(string url)
         {
             /* base URL */
+            if(url == "" || url == null)
+            {
+                return FailRetuenJson("5");
+            }
             /* example: https://rateyourmusic.com/release/album/green-day/39_smooth/ */
             HttpResponseMessage response = client.GetAsync(url).Result;
 
