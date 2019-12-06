@@ -26,9 +26,8 @@ function getSearchResults() {
             method: "GET",
             data: { name: $('#name').text() }
         }).done(function (response) {
-            console.log(response);
-            console.log(response.result[0]);
-            console.log(response.result[0].length);
+            //console.log(response);
+            //console.log(response.result[0]);
             if (!response.success) {
                 $('#search-results > tbody:last-child').append('<tr><td>Sorry, no search results for given search fields</td><tr>');
             } else {
@@ -57,7 +56,6 @@ function getDetails(mbid) {
         method: "GET",
         data: { id: mbid }
     }).done(function (response) {
-        console.log(response);
         
     })
     

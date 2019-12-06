@@ -8,37 +8,8 @@ $('#search-form').submit(function (e)
     e.preventDefault();
     let type = "&search=" + $('#search-type').val();
     let input = "name= " + $('#search').val();
-    //$.ajax({
-    //    url: "/API/search" + type,
-    //    method: "GET",
-    //    data: { name: input}
-    //}).done(function (response) {
-    //    console.log(response);
-    //    alert("test");
-    //})
-    window.location.href = '/Home/SearchResults/?'+input + type;
 
-    //e.preventDefault();
-    //$.ajax({
-    //    url: "/API/search" + $('#search-type').val(),
-    //    data: { name: $('#search').val() },
-    //    method: "GET"
-    //})
-    //    .then(function (response) {
-    //        if (!response.success)
-    //            return;
-    //        if ($('#search-type').val() === "Artist") {
-    //            console.log(response.result[0].name);
-    //            console.log(response.result[0].tags[0].name);
-    //            console.log(response.result[0].begin_area.name);
-    //            console.log(response.result[0].life_span.begin);
-    //        } else {
-    //            console.log(response.result[0].title);
-    //            console.log(response.result[0].score);
-    //            console.log(response.result[0].artist_credit[0].artist.name);
-    //            console.log(response.result[0].tags[0].name);
-    //        }
-    //    });
+    window.location.href = '/Home/SearchResults/?'+input + type;
 });
 
 function navigateToSearchPage() {
