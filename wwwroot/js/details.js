@@ -16,6 +16,7 @@ class detailsPage {
         }
     }
 
+    /* get all details */
     getArtistDetails(id_input) {
         let that = this;
         $.ajax({
@@ -52,15 +53,94 @@ class detailsPage {
                 /* album settings */
                 that.setAlbumImage(response.result.image);
                 that.setAlbumTitle(response.result.title);
-                that.setAlbumArtist(response.result.artists[0].name, response.result.artists[0].id);
-                that.setAlbumArtist(response.result.artists[0].name, response.result.artists[0].id);
+                let listOfArtist = response.result.artists;
+                listOfArtist.forEach(function (item) {
+                    that.setAlbumArtist(item.name, item.id);
+                });
 
+                /* get rate */
+                let allmusic_url = response.result.allmusic;
+                let allmusic_id = allmusic_url.replace("https://www.allmusic.com/album/", "");
+                that.getAllMusicRate(allmusic_id);
+                let discogs_url = response.result.discogs;
+                let discogs_id = discogs_url.replace("https://www.discogs.com/master/", "");
+                that.getDiscogsRate(discogs_id);
+                let rym_url = response.result.rate_your_music;
+                let rym_id = rym_url.replace("", "");
+                that.getRYMRate(rym_url);
             },
             error: function() {
                 console.log('[getAlbumDetails] Error occured');
             }
         });
     }
+
+    /* get rating details */
+    getAllMusicRate(id_input) {
+        let that = this;
+        $.ajax({
+            url: "/scraper/allMusicRatings",
+            method: "GET",
+            data: {
+                id: id_input
+            },
+            success: function (r) {
+                console.log("allMusicRatings");
+                console.log(r);
+
+                /* all music rate settings */
+                that.setAlbumRate_allmusic(r.site_rating, r.user_rating, r.max_rating);
+
+            },
+            error: function () {
+                console.log('[getAlbumDetails] Error occured');
+            }
+        });
+    }
+    getDiscogsRate(id_input) {
+        let that = this;
+        $.ajax({
+            url: "/scraper/discogsRatings",
+            method: "GET",
+            data: {
+                id: id_input
+            },
+            success: function (r) {
+                console.log("discogsRatings");
+                console.log(r);
+
+                /* all music rate settings */
+                that.setAlbumRate_discogs(r.rating, r.max_rating);
+
+            },
+            error: function () {
+                console.log('[getAlbumDetails] Error occured');
+            }
+        });
+    }
+    getRYMRate(id_input) {
+        console.log("!!!!!!!!!!!!!!!!!");
+
+        let that = this;
+        $.ajax({
+            url: "/scraper/rateYourMusicRatings",
+            method: "GET",
+            data: {
+                id: id_input
+            },
+            success: function (r) {
+                console.log("rateYourMusicRatings");
+                console.log(r);
+
+                /* all music rate settings */
+                that.setAlbumRate_rym(r.rating, r.max_rating);
+            },
+            error: function () {
+                console.log('[getAlbumDetails] Error occured');
+            }
+        });
+    }
+
 
     /*********/
     /* image */
@@ -107,4 +187,13 @@ class detailsPage {
 
 
     /* Album */
+    setAlbumRate_allmusic(site_rate, user_rate, max_rate) {
+        $("#allmusic_rating").text(site_rate + "/" + max_rate);
+    }
+    setAlbumRate_discogs(site_rate, max_rate) {
+        $("#discogs_rating").text(site_rate + "/" + max_rate);
+    }
+    setAlbumRate_rym(site_rate, max_rate) {
+        $("#rym_rating").text(site_rate + "/" + max_rate);
+    }
 }
