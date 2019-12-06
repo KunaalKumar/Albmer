@@ -7,7 +7,12 @@
 <h1>Search Results</h1>
 <div><span id="type">@Model.SearchType</span>:<span id="name">@Model.Name</span></div>
 
-<table class="table" id="results">
+<table class="table" id="search-results" onload="getSearchResults()">
     <tbody></tbody>
 </table>
 
+<script src="~/js/search.js" asp-append-version="true"></script>
+<script src="~/lib/jquery/dist/jquery.min.js"></script>
+<script>
+        $(document).ready(getSearchResults());
+</script>
