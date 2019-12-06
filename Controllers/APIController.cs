@@ -426,15 +426,21 @@ namespace Albmer.Controllers
                             }
                         }
 
-                        //TODO: Make seperate request for image
-                        response = client.GetAsync("http://coverartarchive.org/release/" + releaseId).Result;
-                        response.EnsureSuccessStatusCode();
-                        responseBody = response.Content.ReadAsStringAsync().Result;
-                        CoverArtResult artResult = JsonConvert.DeserializeObject<CoverArtResult>(responseBody);
-                        foreach (CoverImages image in artResult.images)
+                        try
                         {
-                            if (image.isFront)
-                                album.Image = image.image;
+                            response = client.GetAsync("http://coverartarchive.org/release/" + releaseId).Result;
+                            response.EnsureSuccessStatusCode();
+                            responseBody = response.Content.ReadAsStringAsync().Result;
+                            CoverArtResult artResult = JsonConvert.DeserializeObject<CoverArtResult>(responseBody);
+                            foreach (CoverImages image in artResult.images)
+                            {
+                                if (image.isFront)
+                                    album.Image = image.image;
+                            }
+                        }
+                        catch (Exception e)
+                        { 
+                            // Ignore - Cover art not found                        
                         }
 
                         // Call to get artist relations and songs
