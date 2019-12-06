@@ -5,25 +5,26 @@
 
 class detailsPage {
 
-    constructor(id, detailsSwitch) {
+    constructor(str, detailsSwitch) {
 
         if (detailsSwitch === "album") {
-            this.getAlbumDetails(id);
-            console.log("album: id=" + id);
+            this.getAlbumDetails(str);
+            console.log("album: id=" + str);
         } else if (detailsSwitch === "artist") {
-            this.getArtistDetails(id);
-            console.log("artist: id=" + id);
+            this.getArtistDetails(str);
+            console.log("artist: name=" + str);
         }
     }
 
     /* get all details */
-    getArtistDetails(id_input) {
+    getArtistDetails(name_input) {
         let that = this;
+        let tmpName = encodeURIComponent(name_input);
         $.ajax({
             url: "/API/artistDetails",
             method: "GET",
             data: {
-                id: id_input
+                name: tmpName
             },
             success: function(response) {
                 console.log("getArtistDetails");
@@ -173,7 +174,7 @@ class detailsPage {
     }
 
     setAlbumArtist(artistStr, artistName) {
-        $("#detailsPageAlbum_artist").append("<a class=\"badge badge-primary mx-1\" href=/Details/Artist?name=" + artistName + " target=\"_blank\">" + artistStr + " </a>");
+        $("#detailsPageAlbum_artist").append("<a class=\"badge badge-primary mx-1\" href=/Details/Artist?name=" + encodeURIComponent(artistName) + " target=\"_blank\">" + artistStr + " </a>");
     }
 
 

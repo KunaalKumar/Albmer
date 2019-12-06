@@ -1,59 +1,33 @@
 ﻿@{
-    ViewData["Title"] = "Artist Details Page";
+    ViewData["Title"] = "Album Details Page";
 }
 
-    <script>
+<script>
     window.onload = function() {
-        let id = "@Html.Raw(ViewData["id"])";
-        let dp = new detailsPage(id, "artist");
-        console.log(id);
+        let name = "@Html.Raw(ViewData["name"])";
+        let dp = new detailsPage(name, "artist");
+        console.log(name);
     }
-    </script>
+</script>
 
-<div class="row">
-    <div class="col-sm-4">
-        <img id="detailsImage" src="https://imgplaceholder.com/420x320" style="width:20rem" class="rounded float-left" alt="Artist/Album image">
+<div class="row align-items-center">
+    <div class="col-sm-4 text-center">
+        <img id="detailsPageAlbum_image" src="https://imgplaceholder.com/420x320" style="width:20rem" class="rounded img-thumbnail m-2" alt="Artist/Album image">
     </div>
 
     <div class="col-sm-8">
-        <h1 id="detailsPageTitle"> Title</h1>
-        <p>
-            This will be some descriptiosns,This will be some descriptiosnsThis will be some descriptiosnsThis will be some descriptiosnsThis will be some descriptiosnsThis will be some descriptiosnsThis will be some descriptiosnsThis will be some descriptiosnsThis will be some descriptiosns
-        </p>
+        <h1 id="detailsPageAlbum_title"> Album Title </h1>
+        <h4 id="detailsPageAlbum_artist"> Artist: </h4>
+        <div> All Music: <span id="allmusic_rating"></span> </div>
+        <div> Discogs: <span id="discogs_rating"></span> </div>
+        <div> Rate Your Music: <span id="rym_rating"></span> </div>
     </div>
 </div>
 
-<div class="row">
+<div class="row mt-2">
 
-    <table class="table table-dark">
-        <thead>
-            <tr>
-                <th scope="col">#</th>
-                <th scope="col">Song</th>
-                <th scope="col">Description</th>
-                <th scope="col">Reviews</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr>
-                <th scope="row">1</th>
-                <td>Mark</td>
-                <td>Otto</td>
-                <td>10/10</td>
-            </tr>
-            <tr>
-                <th scope="row">2</th>
-                <td>Jacob</td>
-                <td>Thornton</td>
-                <td>10/10</td>
-            </tr>
-            <tr>
-                <th scope="row">3</th>
-                <td>sadfas</td>
-                <td>the Bird</td>
-                <td>10/10</td>
-            </tr>
-        </tbody>
-    </table>
+    <div id="detailsPageAlbum_playlist">
+
+    </div>
 
 </div>
