@@ -55,7 +55,7 @@ class detailsPage {
                 that.setAlbumTitle(response.result.title);
                 let listOfArtist = response.result.artists;
                 listOfArtist.forEach(function (item) {
-                    that.setAlbumArtist(item.name, item.id);
+                    that.setAlbumArtist(item.name, item.name);
                 });
 
                 /* get rate */
@@ -172,8 +172,8 @@ class detailsPage {
         $("#detailsPageAlbum_title").append("<i class=\"fas fa-record-vinyl\"></i> " + "Title: " + titleStr);
     }
 
-    setAlbumArtist(artistStr, artistId) {
-        $("#detailsPageAlbum_artist").append("<a class=\"badge badge-primary mx-1\" href=/Details/Artist?id=" + artistId + " target=\"_blank\">" + artistStr + " </a>");
+    setAlbumArtist(artistStr, artistName) {
+        $("#detailsPageAlbum_artist").append("<a class=\"badge badge-primary mx-1\" href=/Details/Artist?name=" + artistName + " target=\"_blank\">" + artistStr + " </a>");
     }
 
 
