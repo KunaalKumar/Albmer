@@ -23,7 +23,12 @@ namespace Albmer.Controllers
             return View();
         }
 
-        public IActionResult Privacy()
+        public IActionResult Overview()
+        {
+            return View();
+        }
+
+        public IActionResult Landing()
         {
             return View();
         }
