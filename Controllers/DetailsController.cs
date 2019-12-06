@@ -12,5 +12,17 @@ namespace Albmer.Controllers
         {
             return View();
         }
+
+        public IActionResult Artist(string id)
+        {
+            ViewData["id"] = id;
+            return View();
+        }
+
+        public IActionResult Album(string id)
+        {
+            ViewData["id"] = id;
+            return View();
+        }
     }
 }
