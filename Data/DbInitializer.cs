@@ -7,8 +7,7 @@ namespace Albmer.Data
     {
         public static void Initialize(CacheContext context)
         {
-            context.Database.EnsureCreated();
-            context.Database.Migrate();
+               context.Database.Migrate();
         }
     }
 }
