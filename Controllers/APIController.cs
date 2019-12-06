@@ -149,6 +149,11 @@ namespace Albmer.Controllers
         [HttpGet]
         public JsonResult searchAlbum(string name)
         {
+            if (String.IsNullOrEmpty(name))
+            {
+                return Json(new { success = false, result = "name parameter not provided" });
+            }
+
             // Remove whitespace from start and end; Replace successive white spaces with a single white space
             Regex regex = new Regex("[ ]{2,}", RegexOptions.None);
             name = regex.Replace(name.Trim(), " ");
@@ -167,7 +172,6 @@ namespace Albmer.Controllers
                         id = m.ArtistId
                     })
                 })
-                //.ThenInclude(rel => rel.Artist)
                 .ToList();
             if (cachedResult.Count > 0) // Exists in cache
             {
@@ -191,7 +195,7 @@ namespace Albmer.Controllers
                     {
                         foreach (MBAlbum album in result.release_groups)
                         {
-                            // Check to see if already exists in dataabse
+                            // Check to see if album exists in database
                             Album dbAlbum = _context.Albums.Where(al => al.ID.Equals(album.id)).FirstOrDefault();
                             if (dbAlbum == null)
                             {
@@ -220,16 +224,21 @@ namespace Albmer.Controllers
                                 // Add relations to artist and album entities
                                 ArtistAlbum rel = new ArtistAlbum 
                                 { 
-                                    Artist = artist,
                                     ArtistId = artist.ID,
-                                    Album = dbAlbum,
                                     AlbumId = dbAlbum.ID
                                 };
                                 dbAlbum.ArtistAlbum.Add(rel);
                             }
 
                             _context.Albums.Update(dbAlbum);
+                            try
+                            {
                                 _context.SaveChanges();
+                            }
+                            catch (Exception e)
+                            { 
+                                // Ignore already exists
+                            }
                             data.Add(mbAlbumToAnon(album));
                         }
                         return Json(new { success = true, result = data });
@@ -256,9 +265,14 @@ namespace Albmer.Controllers
             });
         }
 
-[HttpGet]
+        [HttpGet]
         public JsonResult artistDetails(string id)
         {
+            if (String.IsNullOrEmpty(id))
+            {
+                return Json(new { success = false, result = "id parameter not provided" });
+            }
+
             var artist = _context.Artists.Where(artist => artist.ID.Equals(id))
                 .Include(artist => artist.ArtistAlbum)
                 .ThenInclude(aa => aa.Album)
@@ -319,22 +333,16 @@ namespace Albmer.Controllers
                                 _context.SaveChanges();
                             }
 
-                            // Only add relation if doesn't exist
-                            bool exists = false;
-                            foreach (ArtistAlbum relations in artist.ArtistAlbum)
-                            {
-                                if (relations.AlbumId.Equals(album.ID)) 
-                                {
-                                    exists = true;
-                                    break;
-                                }
-                            }
-                            if (!exists)
-                            {
-                                ArtistAlbum rel = new ArtistAlbum { Artist = artist, ArtistId = artist.ID, Album = album, AlbumId = album.ID };
-                                artist.ArtistAlbum.Add(rel);
+                            ArtistAlbum rel = new ArtistAlbum {ArtistId = artist.ID, AlbumId = album.ID };
+                            artist.ArtistAlbum.Add(rel);
 
+                            try
+                            {
                                 _context.SaveChanges();
+                            }
+                            catch (Exception e)
+                            { 
+                                // Ignore already exists
                             }
                         }
 
@@ -356,6 +364,10 @@ namespace Albmer.Controllers
         [HttpGet]
         public JsonResult albumDetails(string id)
         {
+            if (String.IsNullOrEmpty(id))
+            {
+                return Json(new { success = false, result = "id parameter not provided" });
+            }
             var album = _context.Albums.Where(album => album.ID.Equals(id))
                 .Include(album => album.ArtistAlbum)
                 .ThenInclude(aa => aa.Artist)
@@ -443,29 +455,22 @@ namespace Albmer.Controllers
                                         _context.Artists.Add(artist);
                                         _context.SaveChanges();
                                     }
+                                    ArtistAlbum newRelation = new ArtistAlbum { Artist = artist, ArtistId = artist.ID, Album = album, AlbumId = album.ID };
 
-                                    // Only add relation if it doesn't exist
-                                    bool exists = false;
-                                    foreach (ArtistAlbum relations in album.ArtistAlbum)
-                                    {
-                                        if (relations.ArtistId.Equals(artist.ID))
-                                        {
-                                            exists = true;
-                                            break;
-                                        }
-                                    }
-                                    if (!exists) // Doesn't exist, Add relation
-                                    {
-                                        ArtistAlbum newRelation = new ArtistAlbum { Artist = artist, ArtistId = artist.ID, Album = album, AlbumId = album.ID };
-                                        artist.ArtistAlbum.Add(newRelation);
-                                        album.ArtistAlbum.Add(newRelation);
+                                    album.ArtistAlbum.Add(newRelation);
 
-                                        _context.Artists.Update(artist);
+                                    _context.Artists.Update(artist);
+
+                                    try
+                                    {
                                         _context.SaveChanges();
+                                    }
+                                    catch (Exception e)
+                                    {
+                                        // Ignore - already exists
                                     }
                                 }
 
-                                _context.Albums.Update(album);
                                 _context.SaveChanges();
 
                                 return Json(new { success = true, result = detailedAlbumToAnon(album) });

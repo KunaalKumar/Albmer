@@ -8,8 +8,8 @@ function getBillboardResults() {
             url: "/Scraper/ScrapeAlbumChart",
             method: "GET",
         }).done(function (response) {
-            for (let i = 0; i < 10; i++) {
-                //getLinks(response.albums[i].artist, response.albums[i].title, i);
+            for (let i = 0; i < 50; i++) {
+                getLinks(response.albums[i].artist, response.albums[i].title, i);
                 $('#billboard-top-album > tbody:last-child').append('<tr><td>' + (i + 1) + '</td><td>' + response.albums[i].title + '</td><td>' + response.albums[i].artist + '</td></tr>');
             }
         })
@@ -26,6 +26,6 @@ function getLinks(artist, album, num) {
             albumName: album
         }
     }).done(function (response) {
-        console.log(num + ") " + response.result);
+        console.log(num + ") " + response.success);
     })
 }
