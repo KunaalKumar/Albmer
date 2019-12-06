@@ -572,26 +572,26 @@ namespace Albmer.Controllers
             {
                 return Json(new { success = false, result = "Supply both artistName and albumName" });
             }
-            dynamic result = ((dynamic)searchAlbumAsync(albumName).Result.Value).result;
+            dynamic result = searchAlbumAsync(albumName).Result.Value;
             if (!result.success)
             {
                 return Json(new { success = false, result = "Unexpected error" });
             }
-            foreach (dynamic album in result)
+            foreach (dynamic album in result.result)
             {
-                if (album.title.Equals(albumName)) // Abum name matches
+                if (album.title.Equals(albumName)) // Album name matches
                 {
                     foreach (dynamic rel in album.artist_credit)
                     {
                         if (rel.name.ToLower().Equals(artistName.ToLower())) // Artist matches
                         {
-                            dynamic detailedAlbum = ((dynamic)albumDetailsAsync(album.id).Result.Value).result;
+                            dynamic detailedAlbum = albumDetailsAsync(album.id).Result.Value;
                             if (!detailedAlbum.success)
                             {
                                 return Json(new { success = false, result = "Unexpected error" });
                             }
-                            return Json(new { success = true, detailedAlbum.title, artist_name = rel.name, 
-                                detailedAlbum.allmusic, detailedAlbum.discogs, rate_your_music = detailedAlbum.rate_your_music });
+                            return Json(new { success = true, detailedAlbum.result.title, artist_name = rel.name, 
+                                detailedAlbum.result.allmusic, detailedAlbum.result.discogs, rate_your_music = detailedAlbum.result.rate_your_music });
                         }
                     }
                 }
