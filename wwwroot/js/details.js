@@ -53,6 +53,8 @@ class detailsPage {
                 that.setAlbumImage(response.result.image);
                 that.setAlbumTitle(response.result.title);
                 that.setAlbumArtist(response.result.artists[0].name, response.result.artists[0].id);
+                that.setAlbumArtist(response.result.artists[0].name, response.result.artists[0].id);
+
             },
             error: function() {
                 console.log('[getAlbumDetails] Error occured');
@@ -88,12 +90,12 @@ class detailsPage {
 
     /* Album */
     setAlbumTitle(titleStr) {
-        $("#detailsPageAlbum_title").text("Title: " + titleStr);
+        $("#detailsPageAlbum_title").empty();
+        $("#detailsPageAlbum_title").append("<i class=\"fas fa-record-vinyl\"></i> " + "Title: " + titleStr);
     }
 
     setAlbumArtist(artistStr, artistId) {
-        $("#detailsPageAlbum_artist a").text("Artist: " + artistStr);
-        $("#detailsPageAlbum_artist a").attr("href", "/Details/Artist?id=" + artistId);
+        $("#detailsPageAlbum_artist").append("<a class=\"badge badge-primary mx-1\" href=/Details/Artist?id=" + artistId + " target=\"_blank\">" + artistStr + " </a>");
     }
 
 
