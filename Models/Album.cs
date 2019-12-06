@@ -22,6 +22,6 @@ namespace Albmer.Models
         public string RateYourMusic { get; set; }
 
 
-        public List<ArtistAlbum> ArtistAlbum { get; } = new List<ArtistAlbum>();
+        public List<ArtistAlbum> ArtistAlbum { get; set; } = new List<ArtistAlbum>();
     }
 }

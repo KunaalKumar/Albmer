@@ -155,8 +155,19 @@ namespace Albmer.Controllers
 
             List<Object> data = new List<Object>();
             var cachedResult = _context.Albums.Where(album => album.Title.ToLower().Contains(name.ToLower()))
-                .Include(album => album.ArtistAlbum)
-                .ThenInclude(aa => aa.Artist)
+                .Select(album => new 
+                {
+                    id = album.ID,
+                    track_count = album.TrackCount,
+                    title = album.Title,
+                    tags = album.Genre,
+                    artist_credit = album.ArtistAlbum
+                    .Select(m => new {
+                        name = m.Artist.Name,
+                        m.ArtistId
+                    })
+                })
+                //.ThenInclude(rel => rel.Artist)
                 .ToList();
             if (cachedResult.Count > 0) // Exists in cache
             {
@@ -548,24 +559,17 @@ namespace Albmer.Controllers
                 return Json(new { success = false, result = "Supply both artistName and albumName" });
             }
             dynamic result = ((dynamic)searchAlbumAsync(albumName).Result.Value).result;
-            foreach (Album album in result)
+            foreach (dynamic album in result)
             {
-                if (album.Title.Equals(albumName)) // Abum name matches
+                if (album.title.Equals(albumName)) // Abum name matches
                 {
-                    foreach (ArtistAlbum rel in album.ArtistAlbum)
+                    foreach (dynamic rel in album.artist_credit)
                     {
-                        if (rel.Artist.Name.ToLower().Equals(artistName.ToLower())) // Artist matches
+                        if (rel.name.ToLower().Equals(artistName.ToLower())) // Artist matches
                         {
-                            if (isDetailedAlbum(album)) // If isn't detailed album, call API/albumDetails
-                            {
-                                return Json(new { success = true, album.Title, artist_name = rel.Artist.Name, album.AllMusic, album.Discogs, album.RateYourMusic });
-                            }
-                            else
-                            {
-                                dynamic detailedAlbum = ((dynamic)albumDetailsAsync(album.ID).Result.Value).result;
-                                return Json(new { success = true, detailedAlbum.title, artist_name = rel.Artist.Name, 
-                                    detailedAlbum.allmusic, detailedAlbum.discogs, rate_your_music = detailedAlbum.rate_your_music });
-                            }
+                            dynamic detailedAlbum = ((dynamic)albumDetailsAsync(album.id).Result.Value).result;
+                            return Json(new { success = true, detailedAlbum.title, artist_name = rel.name, 
+                                detailedAlbum.allmusic, detailedAlbum.discogs, rate_your_music = detailedAlbum.rate_your_music });
                         }
                     }
                 }
