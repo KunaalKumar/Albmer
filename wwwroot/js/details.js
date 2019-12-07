@@ -238,7 +238,7 @@ class detailsPage {
     setArtistInfo_official_website(url) {
         if (url != null) {
             $("#official_website").empty();
-            $("#official_website").append("<a href=\"" + url + "\">" + url + "</a>");
+            $("#official_website").append("<a href=\"" + url + "\" target=\"_blank\">" + url + "</a>");
         }
     }
 
