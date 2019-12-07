@@ -1,4 +1,10 @@
-﻿<!DOCTYPE html>
+﻿@{
+    ViewData["Title"] = "Landing Page";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+
+}
+
+<!DOCTYPE html>
 <html>
 <head>
     <meta charset="utf-8" />
@@ -6,16 +12,22 @@
 </head>
 <body>
 
-    <center><h1>Albmer</h1></center><br />
-    <center><h3>The one stop shop for all your music review needs</h3></center><br />
-    <center><h4>For movie reviews, we have IMDb and for game reviews we have IGN.
-        But what do we have for Music?</h4></center>
-    <center><h2>We've got <strong>Albmer!</strong></h2></center>
-    
-    <br />
+    <div class="jumbotron text-center">
+        <h1 class="display-1">Albmer</h1>
+        <p class="lead">The one stop shop for all your music review needs</p>
+        <hr class="my-4">
+        <p>
+            For movie reviews, we have IMDb and for game reviews we have IGN. But what do we have for Music?
+        </p>
 
-    Albmer helps users discover new artists through not only ratings from multiple websites but also numerous
-    charts curated by top Billboard critics.<br />
-    <center><button><a href="/Home/Index" class="text-dark">Get Started</a></button> </center>
+        <center><h2>We've got <strong>Albmer!</strong></h2></center>
+
+        <p> Albmer helps users discover new artists through not only ratings from multiple websites but also numerous charts curated by top Billboard critics.</p>
+
+        <p class="lead">
+            <a class="btn btn-primary btn-lg" href="/Home/Index" role="button">Get Started</a>
+        </p>
+    </div>
+
 </body>
 </html>
