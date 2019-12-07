@@ -178,14 +178,19 @@ namespace Albmer.Controllers
                     allMusicRateElement = document.GetElementsByClassName("allmusic-rating")[0];
                 } catch(Exception e)
                 {
-                    return FailRetuenJson();
+                    return Json(new {success = false,
+                    result = e.Message});
                 }
                 string siteRateString = allMusicRateElement.TextContent.Trim();
 
                 /* check if the number is valid */
                 if (!float.TryParse(siteRateString, out float siteRate))
                 {
-                    return FailRetuenJson(siteRateString);
+                    return Json(new
+                    {
+                        success = false,
+                        result = "invalid number" + siteRateString
+                    });
                 }
 
                 return Json(new
