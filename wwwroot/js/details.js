@@ -32,6 +32,11 @@ class detailsPage {
                 /* artist settings */
                 //that.setArtistImage(response.result.image);
                 that.setArtistTitle(response.result.name);
+                let listOfAlbum = response.result.albums;
+                listOfAlbum.forEach(function (item, index) {
+                    that.setArtistAlbum(index, item.title, item.albumId);
+                });
+                
 
                 /* get info */
                 that.setArtistInfo_begin_year(response.result.begin_year);
@@ -181,13 +186,16 @@ class detailsPage {
 
 
     /*********/
-    /* text */
+    /* main */
     /*********/
 
     /* Artist */
     setArtistTitle(titleStr) {
         $("#detailsPageArtist_title").empty();
         $("#detailsPageArtist_title").append("<i class=\"fas fa-user\"></i> " + titleStr);
+    }
+    setArtistAlbum(count, name, id) {
+        $(detailsPageArtist_playlist_content).append("<tr><th scope=\"row\">" + (count+1) + "</th><td><a href=\"/Details/Album/?id=" + id + "\">" + name + "</a></td></tr>")
     }
 
     /* Album */
@@ -199,6 +207,7 @@ class detailsPage {
     setAlbumArtist(artistStr, artistId) {
         $("#detailsPageAlbum_artist").append("<a class=\"badge badge-primary mx-1\" href=/Details/Artist?id=" + artistId + " target=\"_blank\">" + artistStr + " </a>");
     }
+
 
 
     /*********/
