@@ -1,4 +1,7 @@
 # Albmer
+
+<img src="wwwroot/favicon.png" alt="drawing" width="150"/>
+
 Albmer will scrape various music related sites for album reviews and ratings. This data will be displayed to users for Billboard top music charts and for individual artists or albums available through custom searches.
 
 ## API Endpoints
