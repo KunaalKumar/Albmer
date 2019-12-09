@@ -163,7 +163,7 @@ namespace Albmer.Controllers
             name = regex.Replace(name.Trim(), " ");
 
             List<Object> data = new List<Object>();
-            var cachedResult = _context.Albums.Where(album => album.Title.ToLower().Contains(name.ToLower()))
+            var cachedResult = _context.Albums.Where(album => album.Title.ToLower().Equals(name.ToLower()))
                 .Select(album => new 
                 {
                     id = album.ID,
