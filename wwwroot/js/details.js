@@ -81,16 +81,23 @@ class detailsPage {
                 if (allmusic_url != null) {
                     let allmusic_id = allmusic_url.replace("https://www.allmusic.com/album/", "");
                     that.getAllMusicRate(allmusic_id);
+                } else {
+                    $("#allmusic_rating").text("Unavailable");
                 }
                 let discogs_url = response.result.discogs;
                 if (discogs_url != null) {
                     let discogs_id = discogs_url.replace("https://www.discogs.com/master/", "");
                     that.getDiscogsRate(discogs_id);
+                } else {
+                    $("#discogs_rating").text("Unavailable");
                 }
+
                 let rym_url = response.result.rate_your_music;
                 if (rym_url != null) {
                     //let rym_id = rym_url.replace("", "");
                     that.getRYMRate(rym_url);
+                } else {
+                    $("#rym_rating").text("Unavailable");
                 }
             },
             error: function() {
@@ -111,9 +118,14 @@ class detailsPage {
             success: function (r) {
                 console.log("allMusicRatings");
                 console.log(r);
+                if (!r.success) {
+                    $("#allmusic_rating").text("Unavailable");
 
-                /* all music rate settings */
-                that.setAlbumRate_allmusic(r.site_rating, r.user_rating, r.max_rating);
+                } else {
+
+                    /* all music rate settings */
+                    that.setAlbumRate_allmusic(r.site_rating, r.user_rating, r.max_rating);
+                }
 
             },
             error: function () {
