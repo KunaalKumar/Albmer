@@ -26,6 +26,7 @@ namespace Albmer
                 try
                 {
                     var context = services.GetRequiredService<CacheContext>();
+                    context.Database.EnsureDeleted();
                     DbInitializer.Initialize(context);
                 }
                 catch (Exception ex)

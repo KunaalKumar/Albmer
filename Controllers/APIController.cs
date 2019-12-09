@@ -43,7 +43,7 @@ namespace Albmer.Controllers
             name = regex.Replace(name.Trim(), " ");
 
             List<Object> data = new List<Object>();
-            List<Artist> cachedResult = _context.Artists.Where(artist => artist.Name.ToLower().Contains(name.ToLower())).ToList();
+            List<Artist> cachedResult = _context.Artists.Where(artist => artist.Name.ToLower().Equals(name.ToLower())).ToList();
             if (cachedResult.Count > 0) // Exists in cache
             {
                 data.AddRange(cachedResult);
