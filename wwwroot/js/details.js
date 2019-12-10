@@ -230,27 +230,37 @@ class detailsPage {
     setArtistInfo_begin_year(year) {
         if (year != null) {
             $("#begin_year").text(year);
+        } else {
+            $("#begin_year").text("Unavailable");
         }
     }
     setArtistInfo_end_year(year) {
         if (year != null) {
             $("#end_year").text(year);
+        } else {
+            $("#end_year").text("Unavailable");
         }
     }
     setArtistInfo_origin(origin) {
         if (origin != null) {
             $("#origin").text(origin);
+        } else {
+            $("#origin").text("Unavailable");
         }
     }
     setArtistInfo_type(type) {
         if (type != null) {
             $("#type").text(type);
+        } else {
+            $("#type").text("Unavailable");
         }
     }
     setArtistInfo_official_website(url) {
         if (url != null) {
             $("#official_website").empty();
             $("#official_website").append("<a href=\"" + url + "\" target=\"_blank\">" + url + "</a>");
+        } else {
+            $("#official_website").text("Unavailable");
         }
     }
 
